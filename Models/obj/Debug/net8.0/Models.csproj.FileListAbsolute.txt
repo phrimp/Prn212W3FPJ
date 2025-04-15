@@ -1,0 +1,14 @@
+E:\Work\Prn212W3FPJ\Models\bin\Debug\net8.0\Models.deps.json
+E:\Work\Prn212W3FPJ\Models\bin\Debug\net8.0\Models.runtimeconfig.json
+E:\Work\Prn212W3FPJ\Models\bin\Debug\net8.0\Models.dll
+E:\Work\Prn212W3FPJ\Models\bin\Debug\net8.0\Models.pdb
+E:\Work\Prn212W3FPJ\Models\obj\Debug\net8.0\Models.csproj.AssemblyReference.cache
+E:\Work\Prn212W3FPJ\Models\obj\Debug\net8.0\Models.GeneratedMSBuildEditorConfig.editorconfig
+E:\Work\Prn212W3FPJ\Models\obj\Debug\net8.0\Models.AssemblyInfoInputs.cache
+E:\Work\Prn212W3FPJ\Models\obj\Debug\net8.0\Models.AssemblyInfo.cs
+E:\Work\Prn212W3FPJ\Models\obj\Debug\net8.0\Models.csproj.CoreCompileInputs.cache
+E:\Work\Prn212W3FPJ\Models\obj\Debug\net8.0\Models.dll
+E:\Work\Prn212W3FPJ\Models\obj\Debug\net8.0\refint\Models.dll
+E:\Work\Prn212W3FPJ\Models\obj\Debug\net8.0\Models.pdb
+E:\Work\Prn212W3FPJ\Models\obj\Debug\net8.0\Models.genruntimeconfig.cache
+E:\Work\Prn212W3FPJ\Models\obj\Debug\net8.0\ref\Models.dll
