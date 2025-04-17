@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35828.75 d17.13
+VisualStudioVersion = 17.13.35828.75
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prn212W3FPJ", "Prn212W3FPJ\Prn212W3FPJ.csproj", "{25B12268-B607-4DB2-9B06-65FFFF3EF87B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csproj", "{9B6F1649-C6F2-49E4-8066-AFFE426A288E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicDAO", "MusicDAO\MusicDAO.csproj", "{15A258C4-31B8-4068-A7C1-47E43CCA7925}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicRepository", "MusicRepository\MusicRepository.csproj", "{5C6C8A2A-5E38-464A-AF1F-EBC7DE7BF9BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{9B6F1649-C6F2-49E4-8066-AFFE426A288E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B6F1649-C6F2-49E4-8066-AFFE426A288E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B6F1649-C6F2-49E4-8066-AFFE426A288E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15A258C4-31B8-4068-A7C1-47E43CCA7925}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15A258C4-31B8-4068-A7C1-47E43CCA7925}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15A258C4-31B8-4068-A7C1-47E43CCA7925}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15A258C4-31B8-4068-A7C1-47E43CCA7925}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C6C8A2A-5E38-464A-AF1F-EBC7DE7BF9BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C6C8A2A-5E38-464A-AF1F-EBC7DE7BF9BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C6C8A2A-5E38-464A-AF1F-EBC7DE7BF9BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C6C8A2A-5E38-464A-AF1F-EBC7DE7BF9BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

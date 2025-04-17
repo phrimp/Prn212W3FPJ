@@ -1195,6 +1195,34 @@
         "runtime": {
           "bin/placeholder/Models.dll": {}
         }
+      },
+      "MusicDAO/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration": "8.0.0",
+          "Microsoft.Extensions.Configuration.Json": "8.0.0",
+          "Models": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/MusicDAO.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MusicDAO.dll": {}
+        }
+      },
+      "MusicRepository/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "MusicDAO": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/MusicRepository.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MusicRepository.dll": {}
+        }
       }
     }
   },
@@ -3237,11 +3265,21 @@
       "type": "project",
       "path": "../Models/Models.csproj",
       "msbuildProject": "../Models/Models.csproj"
+    },
+    "MusicDAO/1.0.0": {
+      "type": "project",
+      "path": "../MusicDAO/MusicDAO.csproj",
+      "msbuildProject": "../MusicDAO/MusicDAO.csproj"
+    },
+    "MusicRepository/1.0.0": {
+      "type": "project",
+      "path": "../MusicRepository/MusicRepository.csproj",
+      "msbuildProject": "../MusicRepository/MusicRepository.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net8.0-windows7.0": [
-      "Models >= 1.0.0"
+      "MusicRepository >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -3276,8 +3314,8 @@
         "net8.0-windows7.0": {
           "targetAlias": "net8.0-windows",
           "projectReferences": {
-            "C:\\Users\\laith\\Desktop\\music-player\\Models\\Models.csproj": {
-              "projectPath": "C:\\Users\\laith\\Desktop\\music-player\\Models\\Models.csproj"
+            "C:\\Users\\laith\\Desktop\\music-player\\MusicRepository\\MusicRepository.csproj": {
+              "projectPath": "C:\\Users\\laith\\Desktop\\music-player\\MusicRepository\\MusicRepository.csproj"
             }
           }
         }
