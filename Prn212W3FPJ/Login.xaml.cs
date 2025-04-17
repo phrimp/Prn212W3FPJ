@@ -13,16 +13,21 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Prn212W3FPJ
-{
+namespace Prn212W3FPJ;
+
     /// <summary>
     /// Interaction logic for Login.xaml
     /// </summary>
-    public partial class Login : Page
+    public partial class Login
     {
         public Login()
         {
             InitializeComponent();
         }
+
+    private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+
     }
 }
+

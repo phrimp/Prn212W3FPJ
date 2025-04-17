@@ -18,7 +18,7 @@
             <TextBlock Text="LOGIN" Foreground="#808080" FontWeight="Bold" Margin="0,0,0,20"/>
 
             <TextBlock Text="Email" Foreground="#B3B3B3" Margin="0,0,0,5"/>
-            <TextBox Height="40" Padding="10,0" VerticalContentAlignment="Center" Background="#252525" Foreground="White" BorderBrush="#3E3E3E" BorderThickness="1">
+            <TextBox Height="40" Padding="10,0" VerticalContentAlignment="Center" Background="#252525" Foreground="White" BorderBrush="#3E3E3E" BorderThickness="1" TextChanged="TextBox_TextChanged">
                 <TextBox.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="4"/>

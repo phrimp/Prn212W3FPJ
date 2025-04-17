@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using Models;
+using MusicRepository;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,5 +21,12 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        SongRepository songRepository = new SongRepository();
+        Song song = songRepository.GetASong(5);
+        songRepository.PlaySong(song);
     }
 }

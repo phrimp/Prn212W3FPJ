@@ -251,7 +251,7 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Button Content="↺" FontSize="18" Foreground="#B3B3B3" Background="Transparent" BorderThickness="0" Padding="15,0"/>
                 <Button Content="◀◀" FontSize="14" Foreground="#E0E0E0" Background="Transparent" BorderThickness="0" Padding="15,0"/>
-                <Button Content="▶" FontSize="24" Foreground="White" Background="#1DB954" BorderThickness="0" Width="40" Height="40" Margin="10,0">
+                <Button Content="▶" FontSize="24" Foreground="White" Background="#1DB954" BorderThickness="0" Width="40" Height="40" Margin="10,0" Click="Button_Click">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="20"/>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Models;
+using NAudio.Wave;
 
 namespace MusicDAO
 {
@@ -74,6 +75,25 @@ namespace MusicDAO
                 _dbContext.SaveChanges();
             }
         }
+
+        public void PlaySong(Song song)
+        {
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string songPath = Path.Combine(baseDirectory, "..", "..", "..", "Assets", "Songs", song.FilePath);
+
+            using (var audioFile = new AudioFileReader(songPath))
+            using (var outputDevice = new WaveOutEvent())
+            {
+                outputDevice.Init(audioFile);
+                outputDevice.Play();
+
+                while (outputDevice.PlaybackState == PlaybackState.Playing)
+                {
+                    Thread.Sleep(100);
+                }
+            }
+        }
+
 
     }
 }

@@ -4388,23 +4388,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\laith\\.nuget\\packages\\": {},
+    "C:\\Users\\thaip\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\laith\\Desktop\\music-player\\Models\\Models.csproj",
+      "projectUniqueName": "I:\\Prn212W3FPJ\\Models\\Models.csproj",
       "projectName": "Models",
-      "projectPath": "C:\\Users\\laith\\Desktop\\music-player\\Models\\Models.csproj",
-      "packagesPath": "C:\\Users\\laith\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\laith\\Desktop\\music-player\\Models\\obj\\",
+      "projectPath": "I:\\Prn212W3FPJ\\Models\\Models.csproj",
+      "packagesPath": "C:\\Users\\thaip\\.nuget\\packages\\",
+      "outputPath": "I:\\Prn212W3FPJ\\Models\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\laith\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\thaip\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -4431,7 +4431,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -4478,7 +4478,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.102/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

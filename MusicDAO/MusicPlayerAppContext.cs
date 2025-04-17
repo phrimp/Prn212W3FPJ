@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -34,20 +35,18 @@ public partial class MusicPlayerAppContext : DbContext
 
     public virtual DbSet<UserFavorite> UserFavorites { get; set; }
 
+    private String GetConnectionString()
+    {
+        IConfiguration config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", true, true)
+            .Build();
+        return config.GetConnectionString("DB");
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer(GetConnectionString());
-
-    protected string GetConnectionString()
-    {
-        var builder = new ConfigurationBuilder()
-           .SetBasePath(Directory.GetCurrentDirectory())
-           .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-
-        var configuration = builder.Build();
-        string connectionString = configuration.GetConnectionString("DefaultConnectionStringDB");
-        return connectionString;
-    }
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-P3AA84P\\MYSQLSERVERR;Uid=sa;Pwd=12345;Database=MusicPlayerApp;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

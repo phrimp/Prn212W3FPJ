@@ -18,7 +18,7 @@ namespace Prn212W3FPJ
     /// <summary>
     /// Interaction logic for MusicManagement.xaml
     /// </summary>
-    public partial class MusicManagement : Page
+    public partial class MusicManagement
     {
         public MusicManagement()
         {

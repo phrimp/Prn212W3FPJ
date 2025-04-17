@@ -18,7 +18,7 @@ namespace Prn212W3FPJ
     /// <summary>
     /// Interaction logic for Register.xaml
     /// </summary>
-    public partial class Register : Page
+    public partial class Register
     {
         public Register()
         {
