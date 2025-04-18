@@ -33,7 +33,7 @@
                         </Style>
                     </Button.Resources>
                 </Button>
-                <Button Content="Login" Width="80" Height="30" Margin="10,0" Background="#1DB954" Foreground="White" BorderThickness="0">
+                <Button Content="Sign Out" Width="80" Height="30" Margin="10,0" Background="#1DB954" Foreground="White" BorderThickness="0">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="4"/>
@@ -129,97 +129,62 @@
 
                 <!-- Song List -->
                 <ListView x:Name="Favorite_List" Grid.Row="1" Margin="20,20,20,10" Background="Transparent" BorderThickness="0" Foreground="White"
-                          SelectionChanged="Favorite_List_SelectionChanged" >
-
+                          SelectionChanged="Favorite_List_SelectionChanged">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Padding" Value="5" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="#333333" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#2A2A2A" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="#" Width="40"/>
-                            <GridViewColumn Header="TITLE" Width="200"/>
-                            <GridViewColumn Header="ARTIST" Width="150"/>
-                            <GridViewColumn Header="ALBUM" Width="150"/>
-                            <GridViewColumn Header="DURATION" Width="80"/>
+                        <GridView AllowsColumnReorder="False">
+                            <GridViewColumn Header="#" Width="40">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Index}" VerticalAlignment="Center" Foreground="White" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="TITLE" Width="200">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Title}" VerticalAlignment="Center" Foreground="White" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="ARTIST" Width="150">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Artist}" VerticalAlignment="Center" Foreground="White" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="ALBUM" Width="150">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Album}" VerticalAlignment="Center" Foreground="White" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="DURATION" Width="80">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Duration}" VerticalAlignment="Center" Foreground="White" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
                         </GridView>
                     </ListView.View>
-                    <ListViewItem>
-                        <Grid Width="620">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="80"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="1" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="Starlight" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="2" Text="Muse" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="3" Text="Black Holes and Revelations" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="4" Text="4:03" VerticalAlignment="Center"/>
-                        </Grid>
-                    </ListViewItem>
-                    <ListViewItem>
-                        <Grid Width="620">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="80"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="2" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="Blinding Lights" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="2" Text="The Weeknd" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="3" Text="After Hours" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="4" Text="3:22" VerticalAlignment="Center"/>
-                        </Grid>
-                    </ListViewItem>
-                    <ListViewItem>
-                        <Grid Width="620">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="80"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="3" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="Dreams" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="2" Text="Fleetwood Mac" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="3" Text="Rumours" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="4" Text="4:17" VerticalAlignment="Center"/>
-                        </Grid>
-                    </ListViewItem>
-                    <ListViewItem Background="#333333">
-                        <Grid Width="620">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="80"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="4" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="Don't Start Now" VerticalAlignment="Center" FontWeight="SemiBold"/>
-                            <TextBlock Grid.Column="2" Text="Dua Lipa" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="3" Text="Future Nostalgia" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="4" Text="3:19" VerticalAlignment="Center"/>
-                        </Grid>
-                    </ListViewItem>
-                    <ListViewItem>
-                        <Grid Width="620">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="80"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="5" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="Uptown Funk" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="2" Text="Mark Ronson ft. Bruno Mars" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="3" Text="Uptown Special" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="4" Text="4:30" VerticalAlignment="Center"/>
-                        </Grid>
-                    </ListViewItem>
                 </ListView>
             </Grid>
         </Grid>
@@ -243,8 +208,8 @@
                     <TextBlock Text="♫" FontSize="32" Foreground="#1DB954" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 </Border>
                 <StackPanel Margin="15,0,0,0" VerticalAlignment="Center">
-                    <TextBlock x:Name="song_name" Text="Don't Start Now" Foreground="White" FontSize="14" FontWeight="SemiBold"/>
-                    <TextBlock x:Name="song_artist" Text="Dua Lipa" Foreground="#B3B3B3" FontSize="12" Margin="0,4,0,0"/>
+                    <TextBlock x:Name="song_name" Text="Select a song" Foreground="White" FontSize="14" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="song_artist" Text="No artist" Foreground="#B3B3B3" FontSize="12" Margin="0,4,0,0"/>
                 </StackPanel>
                 <Button Content="♥" FontSize="18" Foreground="#1DB954" Background="Transparent" BorderThickness="0" Margin="15,0,0,0" Padding="10,0"/>
             </StackPanel>
@@ -252,22 +217,22 @@
             <!-- Controls -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Button x:Name="ShuffleBtn" Content="🔀" FontSize="14" Foreground="#B3B3B3" Background="Transparent" BorderThickness="0" Padding="15,0"/>
-                <Button x:Name="PrevButton" Content="◀◀" FontSize="14" Foreground="#E0E0E0" Background="Transparent" BorderThickness="0" Padding="15,0"/>
-                <Button x:Name="PlayBtn" Content="▶" FontSize="24" Foreground="White" Background="#1DB954" BorderThickness="0" Width="40" Height="40" Margin="10,0">
+                <Button x:Name="PrevButton" Content="◀◀" FontSize="14" Foreground="#E0E0E0" Background="Transparent" BorderThickness="0" Padding="15,0" Click="PreviousSong_Click"/>
+                <Button x:Name="PlayBtn" Content="▶" FontSize="24" Foreground="White" Background="#1DB954" BorderThickness="0" Width="40" Height="40" Margin="10,0" Click="PlaySong">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="20"/>
                         </Style>
                     </Button.Resources>
                 </Button>
-                <Button x:Name="NextButton" Content="▶▶" FontSize="14" Foreground="#E0E0E0" Background="Transparent" BorderThickness="0" Padding="15,0"/>
-                <Button x:Name="LoopBtn" Content="↻" FontSize="18" Foreground="#B3B3B3" Background="Transparent" BorderThickness="0" Padding="15,0"/>
+                <Button x:Name="NextButton" Content="▶▶" FontSize="14" Foreground="#E0E0E0" Background="Transparent" BorderThickness="0" Padding="15,0" Click="NextSong_Click"/>
+                <Button x:Name="LoopBtn" Content="↻" FontSize="18" Foreground="#B3B3B3" Background="Transparent" BorderThickness="0" Padding="15,0" Click="ToggleLoop_Click"/>
             </StackPanel>
 
             <!-- Volume -->
             <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
                 <Button Content="🔊" FontSize="14" Foreground="#E0E0E0" Background="Transparent" BorderThickness="0" Padding="10,0"/>
-                <Slider x:Name="VolumeSlider" Width="100" Value="70" Maximum="100" Margin="10,0" Background="#3E3E3E" Foreground="#1DB954"/>
+                <Slider x:Name="VolumeSlider" Width="100" Value="70" Maximum="100" Margin="10,0" Background="#3E3E3E" Foreground="#1DB954" ValueChanged="VolumeSlider_ValueChanged"/>
             </StackPanel>
         </Grid>
     </Grid>
