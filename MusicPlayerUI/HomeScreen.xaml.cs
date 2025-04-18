@@ -1,26 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using MusicPlayerEntities;
-using MusicPlayerRepositories;
 using MusicPlayerServices;
 
 namespace MusicPlayerUI
 {
-    /// <summary>
-    /// Interaction logic for HomeScreen.xaml
-    /// </summary>
     public partial class HomeScreen : Window
     {
         private UserService _userService;
@@ -34,6 +21,15 @@ namespace MusicPlayerUI
             _songService = new SongService();
 
             LoadFavorites();
+
+            // Set event handler for window closing to clean up resources
+            this.Closing += HomeScreen_Closing;
+        }
+
+        private void HomeScreen_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // Clean up player resources when window is closed
+            _songService.Dispose();
         }
 
         private void LoadFavorites()
@@ -42,8 +38,7 @@ namespace MusicPlayerUI
             {
                 Favorite_List.Items.Clear();
 
-
-                List<Song> favotites = _userService.GetMyFavotites(_currentUserId);
+                List<Song> favotites = _songService.GetAll();
                 if (favotites == null) { return; }
 
                 int index = 1;
@@ -53,10 +48,10 @@ namespace MusicPlayerUI
                     index++;
                 }
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 MessageBox.Show($"Error loading favorites: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            
         }
 
         private ListViewItem CreateSongListItem(Song song, int index)
@@ -122,6 +117,11 @@ namespace MusicPlayerUI
                 song_artist.Text = song.Artist?.Name ?? "Unknown Artist";
             };
 
+            // Double-click to play the song directly
+            item.MouseDoubleClick += (sender, e) => {
+                PlaySelectedSong();
+            };
+
             return item;
         }
 
@@ -145,12 +145,103 @@ namespace MusicPlayerUI
 
         private void PlaySong(object sender, RoutedEventArgs e)
         {
-            SongRepository songRepository = new SongRepository();
-            Song song = songRepository.GetOne(1);
-            song_name.Text = song.Title;
-            song_artist.Text = song.Artist?.Name ?? "Unknown Artist";
+            if (_songService.IsPaused())
+            {
+                // If paused, resume playback
+                _songService.ResumePlayback();
+                PlayBtn.Content = "❚❚";
+            }
+            else if (_songService.GetPlaybackState() == NAudio.Wave.PlaybackState.Playing)
+            {
+                // If playing, pause playback
+                _songService.PausePlayback();
+                PlayBtn.Content = "▶";
+            }
+            else
+            {
+                // If stopped or no current song, play the selected song or queue
+                if (Favorite_List.SelectedItem != null)
+                {
+                    PlaySelectedSong();
+                }
+                else
+                {
+                    // If no song is selected but there are songs in favorites, load all favorites to queue
+                    LoadFavoritesToQueue();
+                    _songService.PlayFromQueue();
+                    UpdateNowPlayingInfo();
+                }
+            }
+        }
+
+        private void PlaySelectedSong()
+        {
+            ListViewItem selectedItem = Favorite_List.SelectedItem as ListViewItem;
+            if (selectedItem != null)
+            {
+                Song selectedSong = selectedItem.Tag as Song;
+                if (selectedSong != null)
+                {
+                    _songService.PlaySong(selectedSong);
+                    PlayBtn.Content = "❚❚";
+                    UpdateNowPlayingInfo();
+                }
+            }
+        }
+
+        private void LoadFavoritesToQueue()
+        {
+            // First clear the current queue
+            _songService.ClearQueue();
+
+            // Add all favorite songs to queue
+            List<Song> favorites = _userService.GetMyFavotites(_currentUserId);
+            if (favorites != null && favorites.Count > 0)
+            {
+                foreach (var song in favorites)
+                {
+                    _songService.AddToQueue(song);
+                }
+            }
+        }
+
+        private void NextSong_Click(object sender, RoutedEventArgs e)
+        {
+            _songService.NextSong();
+            UpdateNowPlayingInfo();
             PlayBtn.Content = "❚❚";
-            songRepository.PlaySong(song);
+        }
+
+        private void PreviousSong_Click(object sender, RoutedEventArgs e)
+        {
+            _songService.PreviousSong();
+            UpdateNowPlayingInfo();
+            PlayBtn.Content = "❚❚";
+        }
+
+        private void ToggleLoop_Click(object sender, RoutedEventArgs e)
+        {
+            _songService.ToggleLoop();
+            // Update UI to reflect loop state
+        }
+
+        private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_songService != null)
+            {
+                float volume = (float)(e.NewValue / 100.0); // Convert from percentage to 0-1 range
+                _songService.SetVolume(volume);
+            }
+        }
+
+        private void UpdateNowPlayingInfo()
+        {
+            Song currentSong = _songService.GetCurrentSong();
+            if (currentSong != null)
+            {
+                song_name.Text = currentSong.Title;
+                song_artist.Text = currentSong.Artist?.Name ?? "Unknown Artist";
+            }
         }
     }
 }
