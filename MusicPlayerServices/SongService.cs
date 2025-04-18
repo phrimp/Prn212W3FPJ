@@ -7,7 +7,7 @@ using MusicPlayerEntities;
 
 namespace MusicPlayerRepositories
 {
-    public class SongService
+    public class SongService : ISongService
     {
         public Song? GetOne(int id)
         => SongRepository.Instance.GetOne(id);

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MusicPlayerEntities;
+using MusicPlayerRepositories.Utils;
 
 namespace MusicPlayerRepositories
 {
@@ -30,6 +31,17 @@ namespace MusicPlayerRepositories
             }
         }
 
+        public User? SignIn(string accountIdentify, string password)
+        {
+            string encryptedPassword = MyUtils.Encrypt(password);
+
+            return _dbContext.Users.FirstOrDefault(u =>
+                (u.Username == accountIdentify || u.Email == accountIdentify) &&
+                u.PasswordHash == encryptedPassword &&
+                u.IsActive == true
+            );
+        }
+
         public User? GetOne(int id)
         {
             return _dbContext.Users
@@ -42,14 +54,18 @@ namespace MusicPlayerRepositories
                 .ToList();
         }
 
-        public void Add(User a)
+        public void Add(User user)
         {
-            User cur = GetOne(a.UserId);
-            if (cur != null)
-            {
+            if (user == null)
                 throw new Exception();
-            }
-            _dbContext.Users.Add(a);
+
+            var existingUser = GetOne(user.UserId);
+            if (existingUser != null)
+                throw new Exception();
+
+            user.PasswordHash = MyUtils.Encrypt(user.PasswordHash);
+
+            _dbContext.Users.Add(user);
             _dbContext.SaveChanges();
         }
 
