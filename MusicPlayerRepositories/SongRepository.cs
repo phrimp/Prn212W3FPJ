@@ -399,5 +399,95 @@ namespace MusicPlayerRepositories
                 outputDevice = null;
             }
         }
+
+        #region Artist Song Management
+        // Add these methods to your SongRepository.cs
+
+        public List<Song> GetSongsByArtist(int artistId)
+        {
+            return _dbContext.Songs
+                .Where(s => s.ArtistId == artistId)
+                .OrderBy(s => s.Title)
+                .ToList();
+        }
+
+        public List<Song> GetSongsByArtistName(string artistName)
+        {
+            return _dbContext.Songs
+                .Where(s => s.Artist.Name.Contains(artistName))
+                .OrderBy(s => s.Title)
+                .ToList();
+        }
+
+        public void UpdateSongArtist(int songId, int newArtistId)
+        {
+            var song = GetOne(songId);
+            if (song == null)
+            {
+                throw new Exception("Song not found");
+            }
+
+            var artist = _dbContext.Artists.FirstOrDefault(a => a.ArtistId == newArtistId);
+            if (artist == null)
+            {
+                throw new Exception("Artist not found");
+            }
+
+            song.ArtistId = newArtistId;
+            _dbContext.SaveChanges();
+        }
+
+        public List<Artist> GetAllArtists()
+        {
+            return _dbContext.Artists
+                .OrderBy(a => a.Name)
+                .ToList();
+        }
+
+        public List<Song> SearchSongsByArtist(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return new List<Song>();
+            }
+
+            searchTerm = searchTerm.ToLower();
+
+            return _dbContext.Songs
+                .Where(s => s.Artist.Name.ToLower().Contains(searchTerm))
+                .OrderBy(s => s.Artist.Name)
+                .ThenBy(s => s.Title)
+                .ToList();
+        }
+
+        public List<Song> GetTopSongsByArtist(int artistId, int count = 5)
+        {
+            return _dbContext.Songs
+                .Where(s => s.ArtistId == artistId)
+                .OrderByDescending(s => s.PlayCount)
+                .Take(count)
+                .ToList();
+        }
+
+        public Dictionary<int, int> GetSongCountByArtist()
+        {
+            var result = new Dictionary<int, int>();
+
+            var query = _dbContext.Artists
+                .Select(a => new
+                {
+                    ArtistId = a.ArtistId,
+                    SongCount = a.Songs.Count
+                })
+                .ToList();
+
+            foreach (var item in query)
+            {
+                result.Add(item.ArtistId, item.SongCount);
+            }
+
+            return result;
+        }
+        #endregion
     }
 }

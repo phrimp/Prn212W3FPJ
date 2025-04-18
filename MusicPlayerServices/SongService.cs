@@ -110,5 +110,48 @@ namespace MusicPlayerServices
 
         public void Dispose()
         => _songRepository.Dispose();
+
+        // Add these methods to your SongService.cs
+
+        public List<Song> GetSongsByArtist(int artistId)
+            => _songRepository.GetSongsByArtist(artistId);
+
+        public List<Song> GetSongsByArtistName(string artistName)
+            => _songRepository.GetSongsByArtistName(artistName);
+
+        public void UpdateSongArtist(int songId, int newArtistId)
+            => _songRepository.UpdateSongArtist(songId, newArtistId);
+
+        public List<Artist> GetAllArtists()
+            => _songRepository.GetAllArtists();
+
+        public List<Song> SearchSongsByArtist(string searchTerm)
+            => _songRepository.SearchSongsByArtist(searchTerm);
+
+        public List<Song> GetTopSongsByArtist(int artistId, int count = 5)
+            => _songRepository.GetTopSongsByArtist(artistId, count);
+
+        public Dictionary<int, int> GetSongCountByArtist()
+            => _songRepository.GetSongCountByArtist();
+
+        public void PlayAllSongsByArtist(int artistId)
+        {
+            var songs = _songRepository.GetSongsByArtist(artistId);
+            if (songs.Count == 0)
+            {
+                return;
+            }
+
+            // Clear current queue and add all songs by this artist
+            _songRepository.ClearQueue();
+
+            foreach (var song in songs)
+            {
+                _songRepository.AddToQueue(song);
+            }
+
+            // Start playback of the first song
+            _songRepository.PlayFromQueue();
+        }
     }
 }
