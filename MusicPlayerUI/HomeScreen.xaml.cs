@@ -30,6 +30,8 @@ namespace MusicPlayerUI
         public HomeScreen()
         {
             InitializeComponent();
+            _userService = new UserService();
+            _songService = new SongService();
 
             LoadFavorites();
         }
@@ -40,7 +42,8 @@ namespace MusicPlayerUI
             {
                 Favorite_List.Items.Clear();
 
-                List<Song> favotites = _songService.GetAll();
+
+                List<Song> favotites = _userService.GetMyFavotites(_currentUserId);
                 if (favotites == null) { return; }
 
                 int index = 1;
