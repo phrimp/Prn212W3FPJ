@@ -39,8 +39,9 @@ namespace MusicPlayerRepositories
 
         public List<Song> GetAll()
         {
-            return _dbContext.Songs
-                .ToList();
+            var all_songs = _dbContext.Songs.ToList();
+           
+            return all_songs;
         }
 
         public void Add(Song a)
