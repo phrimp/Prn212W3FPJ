@@ -191,7 +191,7 @@
 
         <!-- Song Progress -->
         <Grid Grid.Row="2" Background="#252525" Height="10">
-            <ProgressBar x:Name="SongProgressBar" Value="35" Maximum="100" Background="#3E3E3E" Foreground="#1DB954" BorderThickness="0" />
+            <ProgressBar x:Name="SongProgressBar" Value="0" Maximum="100" Background="#3E3E3E" Foreground="#1DB954" BorderThickness="0" />
         </Grid>
 
         <!-- Player Controls -->

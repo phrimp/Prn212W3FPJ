@@ -87,6 +87,28 @@ namespace MusicPlayerRepositories
             }
         }
 
+        #region Progress Tracking
+
+        public float GetCurrentPosition()
+        {
+            if (currentAudioFile != null)
+            {
+                return (float)currentAudioFile.CurrentTime.TotalSeconds;
+            }
+            return 0;
+        }
+
+        public float GetCurrentDuration()
+        {
+            if (currentAudioFile != null)
+            {
+                return (float)currentAudioFile.TotalTime.TotalSeconds;
+            }
+            return 0;
+        }
+
+        #endregion
+
         #region Queue Management
 
         public void LoadPlaylistToQueue(int playlistId, bool clearCurrentQueue = true)

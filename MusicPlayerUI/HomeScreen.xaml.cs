@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 using MusicPlayerEntities;
 using MusicPlayerServices;
 
@@ -13,6 +14,7 @@ namespace MusicPlayerUI
         private UserService _userService;
         private SongService _songService;
         private int _currentUserId = 1;
+        private DispatcherTimer progressTimer;
 
         public HomeScreen()
         {
@@ -21,13 +23,49 @@ namespace MusicPlayerUI
             _songService = new SongService();
 
             LoadFavorites();
+            InitializeProgressTimer();
 
             // Set event handler for window closing to clean up resources
             this.Closing += HomeScreen_Closing;
         }
 
+        private void InitializeProgressTimer()
+        {
+            progressTimer = new DispatcherTimer();
+            progressTimer.Interval = TimeSpan.FromMilliseconds(500); // Update every 500ms
+            progressTimer.Tick += ProgressTimer_Tick;
+            progressTimer.Start();
+        }
+
+        private void ProgressTimer_Tick(object sender, EventArgs e)
+        {
+            UpdateProgressBar();
+        }
+
+        private void UpdateProgressBar()
+        {
+            if (_songService.GetPlaybackState() == NAudio.Wave.PlaybackState.Playing)
+            {
+                float position = _songService.GetCurrentPosition();
+                float duration = _songService.GetCurrentDuration();
+
+                if (duration > 0)
+                {
+                    // Calculate percentage and update progress bar
+                    double progressPercentage = (position / duration) * 100;
+                    SongProgressBar.Value = progressPercentage;
+                }
+            }
+        }
+
         private void HomeScreen_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            // Stop timer
+            if (progressTimer != null)
+            {
+                progressTimer.Stop();
+            }
+
             // Clean up player resources when window is closed
             _songService.Dispose();
         }
@@ -156,8 +194,11 @@ namespace MusicPlayerUI
 
         private void ToggleLoop_Click(object sender, RoutedEventArgs e)
         {
+            _songService.ToggleLoop();
             bool isLooping = _songService.IsLooping();
-            LoopBtn.Foreground = isLooping ? new SolidColorBrush(Color.FromRgb(29, 185, 84)) : new SolidColorBrush(Color.FromRgb(179, 179, 179));
+            LoopBtn.Foreground = isLooping
+                ? new SolidColorBrush(Color.FromRgb(29, 185, 84))
+                : new SolidColorBrush(Color.FromRgb(179, 179, 179));
         }
 
         private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -176,6 +217,9 @@ namespace MusicPlayerUI
             {
                 song_name.Text = currentSong.Title;
                 song_artist.Text = currentSong.Artist?.Name ?? "Unknown Artist";
+
+                // Reset progress bar when song changes
+                SongProgressBar.Value = 0;
             }
         }
     }

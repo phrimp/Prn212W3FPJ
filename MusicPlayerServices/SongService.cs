@@ -33,6 +33,13 @@ namespace MusicPlayerServices
         public void Delete(int id)
         => _songRepository.Delete(id);
 
+        // Progress Tracking
+        public float GetCurrentPosition()
+        => _songRepository.GetCurrentPosition();
+
+        public float GetCurrentDuration()
+        => _songRepository.GetCurrentDuration();
+
         // Queue Management
         public void LoadPlaylistToQueue(int playlistId, bool clearCurrentQueue = true)
         => _songRepository.LoadPlaylistToQueue(playlistId, clearCurrentQueue);

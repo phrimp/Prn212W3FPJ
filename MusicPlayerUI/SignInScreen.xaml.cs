@@ -13,8 +13,8 @@ namespace MusicPlayerUI
     /// </summary>
     public partial class SignInScreen : Window
     {
-        private IUserService _userService;
-        public SignInScreen(IUserService userService)
+        private UserService _userService;
+        public SignInScreen(UserService userService)
         {
             InitializeComponent();
             _userService = userService;
