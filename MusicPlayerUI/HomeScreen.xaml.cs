@@ -15,6 +15,8 @@ namespace MusicPlayerUI
         private UserService _userService;
         private SongService _songService;
         private ArtistService _artistService;
+        private AlbumService _albumService;
+        private GenreService _genreService;
         private int _currentUserId = 1;
         private DispatcherTimer progressTimer;
         private Artist _selectedArtist;
@@ -25,6 +27,8 @@ namespace MusicPlayerUI
             _userService = new UserService();
             _songService = new SongService();
             _artistService = new ArtistService();
+            _albumService = new AlbumService();
+            _genreService = new GenreService();
 
             // Show the favorites view by default
             ShowView(FavoritesView);
@@ -221,7 +225,7 @@ namespace MusicPlayerUI
             try
             {
                 ArtistsPanel.Children.Clear();
-                List<Artist> artists = _songService.GetAllArtists();
+                List<Artist> artists = _artistService.GetAllArtists();
 
                 foreach (var artist in artists)
                 {
@@ -364,7 +368,7 @@ namespace MusicPlayerUI
             try
             {
                 ArtistsPanel.Children.Clear();
-                List<Artist> allArtists = _songService.GetAllArtists();
+                List<Artist> allArtists = _artistService.GetAllArtists();
 
                 // Filter artists by name
                 var filteredArtists = allArtists.FindAll(a =>
@@ -609,17 +613,31 @@ namespace MusicPlayerUI
         }
 
         #endregion
-    }
 
-    // ViewModel for song display in ListView
-    public class SongViewModel
-    {
-        public string Index { get; set; }
-        public string Title { get; set; }
-        public string Artist { get; set; }
-        public string Album { get; set; }
-        public string Duration { get; set; }
-        public string PlayCount { get; set; }
-        public Song SongData { get; set; }
+        private void AddSongButton_Click(object sender, RoutedEventArgs e)
+        {
+            var addSongWindow = new AddSongWindow(_songService, _artistService, _albumService, _genreService);
+            if (addSongWindow.ShowDialog() == true)
+            {
+                // Refresh the current view
+                LoadFavorites();
+
+                // Show a success message
+                MessageBox.Show("Song added successfully!", "Success",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        // ViewModel for song display in ListView
+        public class SongViewModel
+        {
+            public string Index { get; set; }
+            public string Title { get; set; }
+            public string Artist { get; set; }
+            public string Album { get; set; }
+            public string Duration { get; set; }
+            public string PlayCount { get; set; }
+            public Song SongData { get; set; }
+        }
     }
 }

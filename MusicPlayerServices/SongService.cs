@@ -122,8 +122,6 @@ namespace MusicPlayerServices
         public void UpdateSongArtist(int songId, int newArtistId)
             => _songRepository.UpdateSongArtist(songId, newArtistId);
 
-        public List<Artist> GetAllArtists()
-            => _songRepository.GetAllArtists();
 
         public List<Song> SearchSongsByArtist(string searchTerm)
             => _songRepository.SearchSongsByArtist(searchTerm);

@@ -437,12 +437,7 @@ namespace MusicPlayerRepositories
             _dbContext.SaveChanges();
         }
 
-        public List<Artist> GetAllArtists()
-        {
-            return _dbContext.Artists
-                .OrderBy(a => a.Name)
-                .ToList();
-        }
+        
 
         public List<Song> SearchSongsByArtist(string searchTerm)
         {

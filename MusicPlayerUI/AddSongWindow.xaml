@@ -1,0 +1,194 @@
+﻿<Window x:Class="MusicPlayerUI.AddSongWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MusicPlayerUI"
+        mc:Ignorable="d"
+        Title="Add New Song" Height="650" Width="800"
+        Background="#1E1E1E" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#252525" Padding="20,15">
+            <TextBlock Text="Add New Song" Foreground="#E0E0E0" FontSize="24" FontWeight="Bold"/>
+        </Border>
+
+        <!-- Content -->
+        <ScrollViewer Grid.Row="1" Margin="0,10,0,0">
+            <StackPanel Margin="30,10">
+                <!-- File Upload Section -->
+                <TextBlock Text="AUDIO FILE" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Background="#252525" CornerRadius="4">
+                        <TextBlock x:Name="SelectedFileText" Text="No file selected" Foreground="#808080" 
+                                   Padding="15,12" TextTrimming="CharacterEllipsis"/>
+                    </Border>
+
+                    <Button Grid.Column="1" Content="Browse..." Margin="10,0,0,0" Padding="15,10" 
+                            Background="#3E3E3E" Foreground="#E0E0E0" BorderThickness="0"
+                            Click="BrowseButton_Click">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="4"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </Grid>
+
+                <!-- Song Details -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Song Title -->
+                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,10,20">
+                        <TextBlock Text="TITLE *" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <Border Background="#252525" CornerRadius="4">
+                            <TextBox x:Name="TitleTextBox" Background="Transparent" BorderThickness="0" 
+                                     Foreground="White" Padding="15,10" FontSize="14"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Artist -->
+                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,0,20">
+                        <TextBlock Text="ARTIST *" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Background="#252525" CornerRadius="4">
+                                <ComboBox x:Name="ArtistComboBox" Background="Transparent" BorderThickness="0" 
+                                         Foreground="White" Padding="10,8" FontSize="14"
+                                         IsEditable="True" StaysOpenOnEdit="True"/>
+                            </Border>
+
+                            <Button Grid.Column="1" Content="+" Margin="5,0,0,0" Width="35" Height="35"
+                                    Background="#1DB954" Foreground="White" BorderThickness="0"
+                                    Click="NewArtistButton_Click">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="4"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Album -->
+                    <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,10,20">
+                        <TextBlock Text="ALBUM" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Background="#252525" CornerRadius="4">
+                                <ComboBox x:Name="AlbumComboBox" Background="Transparent" BorderThickness="0" 
+                                         Foreground="White" Padding="10,8" FontSize="14"
+                                         IsEditable="True" StaysOpenOnEdit="True"/>
+                            </Border>
+
+                            <Button Grid.Column="1" Content="+" Margin="5,0,0,0" Width="35" Height="35"
+                                    Background="#1DB954" Foreground="White" BorderThickness="0"
+                                    Click="NewAlbumButton_Click">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="4"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Genre -->
+                    <StackPanel Grid.Row="1" Grid.Column="1" Margin="10,0,0,20">
+                        <TextBlock Text="GENRE" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <Border Background="#252525" CornerRadius="4">
+                            <ComboBox x:Name="GenreComboBox" Background="Transparent" BorderThickness="0" 
+                                     Foreground="White" Padding="10,8" FontSize="14"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Release Date -->
+                    <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,10,20">
+                        <TextBlock Text="RELEASE DATE" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <Border Background="#252525" CornerRadius="4">
+                            <DatePicker x:Name="ReleaseDatePicker" Background="Transparent" BorderThickness="0" 
+                                       Foreground="White" Padding="15,10" FontSize="14"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Duration (automatically detected) -->
+                    <StackPanel Grid.Row="2" Grid.Column="1" Margin="10,0,0,20">
+                        <TextBlock Text="DURATION (SECONDS)" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <Border Background="#252525" CornerRadius="4">
+                            <TextBox x:Name="DurationTextBox" Background="Transparent" BorderThickness="0" 
+                                     Foreground="White" Padding="15,10" FontSize="14" IsReadOnly="True"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Additional Information -->
+                    <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,20">
+                        <TextBlock Text="NOTES" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <Border Background="#252525" CornerRadius="4">
+                            <TextBox x:Name="NotesTextBox" Background="Transparent" BorderThickness="0" 
+                                     Foreground="White" Padding="15,10" FontSize="14" Height="80"
+                                     TextWrapping="Wrap" AcceptsReturn="True"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer with buttons -->
+        <Grid Grid.Row="2" Background="#252525" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="ErrorMessageText" Grid.Column="0" Foreground="#FF4545" VerticalAlignment="Center"/>
+
+            <Button Grid.Column="1" Content="Cancel" Width="100" Height="40" Margin="0,0,10,0"
+                    Background="#3E3E3E" Foreground="#E0E0E0" BorderThickness="0" Click="CancelButton_Click">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+            <Button Grid.Column="2" Content="Save" Width="100" Height="40"
+                    Background="#1DB954" Foreground="White" BorderThickness="0" Click="SaveButton_Click">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>

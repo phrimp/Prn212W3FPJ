@@ -32,6 +32,27 @@ namespace MusicPlayerRepositories
             }
         }
 
+        public List<Artist> GetAllArtists()
+        {
+            return _dbContext.Artists
+                .OrderBy(a => a.Name)
+                .ToList();
+        }
+
+        public void AddNewArtist(Artist artist)
+        {
+            try
+            {
+                _dbContext.Artists.Add(artist);
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
         public Artist GetArtistById(int artistId)
         {
             return _dbContext.Artists
@@ -47,6 +68,12 @@ namespace MusicPlayerRepositories
             }
 
             return _dbContext.Artists.FirstOrDefault(a => a.ArtistId == song.ArtistId);
+        }
+
+        public List<Artist> GetArtistOrderByName()
+        {
+            var artists = _dbContext.Artists.OrderBy(a => a.Name).ToList();
+            return artists;
         }
     }
 }
