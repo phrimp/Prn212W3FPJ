@@ -30,5 +30,21 @@ namespace MusicPlayerServices
         => UserRepository.Instance.Delete(id);
 
         public List<Song> GetMyFavotites(int id) => UserRepository.Instance.GetMyFavotites(id);
+
+        // Role-related methods
+        public bool IsUserInRole(int userId, string roleName)
+        => UserRepository.Instance.IsUserInRole(userId, roleName);
+
+        public bool IsUserInRole(int userId, int roleId)
+        => UserRepository.Instance.IsUserInRole(userId, roleId);
+
+        public void UpdateUserRole(int userId, int roleId)
+        => UserRepository.Instance.UpdateUserRole(userId, roleId);
+
+        public List<Role> GetAllRoles()
+        => UserRepository.Instance.GetAllRoles();
+
+        public string GetUserRoleName(int userId)
+        => UserRepository.Instance.GetUserRoleName(userId);
     }
 }

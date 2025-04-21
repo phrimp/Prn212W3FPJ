@@ -28,6 +28,8 @@ public partial class MusicPlayerAppContext : DbContext
 
     public virtual DbSet<PlaylistSong> PlaylistSongs { get; set; }
 
+    public virtual DbSet<Role> Roles { get; set; }
+
     public virtual DbSet<Song> Songs { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -166,6 +168,17 @@ public partial class MusicPlayerAppContext : DbContext
                 .HasConstraintName("FK_PlaylistSongs_Songs");
         });
 
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.RoleId).HasName("PK__Roles__8AFACE1A7DBA9E07");
+
+            entity.Property(e => e.RoleId).HasColumnName("RoleID");
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.Description).HasMaxLength(255);
+        });
+
         modelBuilder.Entity<Song>(entity =>
         {
             entity.HasKey(e => e.SongId).HasName("PK__Songs__12E3D6F73E940B55");
@@ -221,6 +234,14 @@ public partial class MusicPlayerAppContext : DbContext
             entity.Property(e => e.Username)
                 .IsRequired()
                 .HasMaxLength(50);
+            entity.Property(e => e.RoleId)
+                .HasColumnName("RoleID")
+                .HasDefaultValue(1);
+
+            entity.HasOne(d => d.Role).WithMany(p => p.Users)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Users_Roles");
         });
 
         modelBuilder.Entity<UserFavorite>(entity =>

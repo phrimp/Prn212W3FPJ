@@ -23,9 +23,13 @@ public partial class User
 
     public bool? IsActive { get; set; }
 
+    public int RoleId { get; set; }
+
     public virtual ICollection<ListeningHistory> ListeningHistories { get; set; } = new List<ListeningHistory>();
 
     public virtual ICollection<Playlist> Playlists { get; set; } = new List<Playlist>();
 
     public virtual ICollection<UserFavorite> UserFavorites { get; set; } = new List<UserFavorite>();
+
+    public virtual Role Role { get; set; }
 }

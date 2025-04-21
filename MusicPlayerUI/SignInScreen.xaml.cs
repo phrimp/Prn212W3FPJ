@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using MusicPlayerEntities;
 using MusicPlayerServices;
 
 namespace MusicPlayerUI
@@ -49,16 +50,34 @@ namespace MusicPlayerUI
             string password = LoginPassword.Password;
             bool rememberMe = RememberMeCheckbox.IsChecked ?? false;
 
-            if (ValidateLogin(username, password))
+            try
             {
-                // TODO: Save login if rememberMe is true
-                HomeScreen homeScreen = new HomeScreen();
-                homeScreen.Show();
-                this.Close();
+                var user = _userService.SignIn(username, password);
+
+                if (user != null)
+                {
+                    // Store current user information for session
+                    App.Current.Properties["CurrentUser"] = user;
+                    App.Current.Properties["UserRole"] = user.Role?.Name ?? "User";
+
+                    // Update last login date
+                    user.LastLoginDate = DateTime.Now;
+                    _userService.Update(user);
+
+                    // Navigate to home screen
+                    HomeScreen homeScreen = new HomeScreen(user);
+                    homeScreen.Show();
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Invalid username or password. Please try again.", "Login Failed",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Invalid username or password. Please try again.", "Login Failed",
+                MessageBox.Show($"Login error: {ex.Message}", "Login Failed",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -72,17 +91,32 @@ namespace MusicPlayerUI
 
             if (ValidateRegistration(email, username, password, confirmPassword))
             {
-                MessageBox.Show("Account created successfully! You can now log in.", "Registration Successful",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                try
+                {
+                    // Create a new user with the User role (1)
+                    var newUser = new User
+                    {
+                        Email = email,
+                        Username = username,
+                        PasswordHash = password, // Will be encrypted in the repository
+                        CreatedDate = DateTime.Now,
+                        IsActive = true,
+                        RoleId = 1 // Default role is User
+                    };
 
-                SetActivePanel(true); // Switch to login
+                    _userService.Add(newUser);
+
+                    MessageBox.Show("Account created successfully! You can now log in.", "Registration Successful",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    SetActivePanel(true); // Switch to login
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Registration error: {ex.Message}", "Registration Failed",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
-        }
-
-        private bool ValidateLogin(string username, string password)
-        {
-            // Replace this with actual login logic
-            return !string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password);
         }
 
         private bool ValidateRegistration(string email, string username, string password, string confirmPassword)

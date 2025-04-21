@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using MusicPlayerEntities;
 using MusicPlayerRepositories.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace MusicPlayerRepositories
 {
     public class UserRepository
     {
-
         private MusicPlayerAppContext _dbContext;
         private static UserRepository instance;
 
@@ -35,22 +35,26 @@ namespace MusicPlayerRepositories
         {
             string encryptedPassword = MyUtils.Encrypt(password);
 
-            return _dbContext.Users.FirstOrDefault(u =>
-                (u.Username == accountIdentify || u.Email == accountIdentify) &&
-                u.PasswordHash == encryptedPassword &&
-                u.IsActive == true
-            );
+            return _dbContext.Users
+                .Include(u => u.Role)
+                .FirstOrDefault(u =>
+                    (u.Username == accountIdentify || u.Email == accountIdentify) &&
+                    u.PasswordHash == encryptedPassword &&
+                    u.IsActive == true
+                );
         }
 
         public User? GetOne(int id)
         {
             return _dbContext.Users
+                .Include(u => u.Role)
                 .SingleOrDefault(a => a.UserId.Equals(id));
         }
 
         public List<User> GetAll()
         {
             return _dbContext.Users
+                .Include(u => u.Role)
                 .ToList();
         }
 
@@ -64,6 +68,12 @@ namespace MusicPlayerRepositories
                 throw new Exception();
 
             user.PasswordHash = MyUtils.Encrypt(user.PasswordHash);
+
+            // Set default role as User (1) if not specified
+            if (user.RoleId <= 0)
+            {
+                user.RoleId = 1;
+            }
 
             _dbContext.Users.Add(user);
             _dbContext.SaveChanges();
@@ -90,7 +100,8 @@ namespace MusicPlayerRepositories
             }
         }
 
-        public List<Song> GetMyFavotites(int id) {
+        public List<Song> GetMyFavotites(int id)
+        {
             User? cur = GetOne(id);
             if (cur == null)
             {
@@ -99,6 +110,54 @@ namespace MusicPlayerRepositories
 
             var favoriteSongs = _dbContext.UserFavorites.Where(uf => uf.UserId == id).Select(uf => uf.Song).ToList();
             return favoriteSongs;
+        }
+
+        // Role-related methods
+        public bool IsUserInRole(int userId, string roleName)
+        {
+            var user = _dbContext.Users
+                .Include(u => u.Role)
+                .FirstOrDefault(u => u.UserId == userId);
+
+            return user != null && user.Role.Name == roleName;
+        }
+
+        public bool IsUserInRole(int userId, int roleId)
+        {
+            var user = GetOne(userId);
+            return user != null && user.RoleId == roleId;
+        }
+
+        public void UpdateUserRole(int userId, int roleId)
+        {
+            var user = GetOne(userId);
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+
+            var role = _dbContext.Roles.FirstOrDefault(r => r.RoleId == roleId);
+            if (role == null)
+            {
+                throw new Exception("Role not found");
+            }
+
+            user.RoleId = roleId;
+            _dbContext.SaveChanges();
+        }
+
+        public List<Role> GetAllRoles()
+        {
+            return _dbContext.Roles.ToList();
+        }
+
+        public string GetUserRoleName(int userId)
+        {
+            var user = _dbContext.Users
+                .Include(u => u.Role)
+                .FirstOrDefault(u => u.UserId == userId);
+
+            return user?.Role?.Name ?? "Unknown";
         }
     }
 }

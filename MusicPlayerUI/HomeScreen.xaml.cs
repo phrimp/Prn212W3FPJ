@@ -20,8 +20,9 @@ namespace MusicPlayerUI
         private int _currentUserId = 1;
         private DispatcherTimer progressTimer;
         private Artist _selectedArtist;
+        private User _currentUser;
 
-        public HomeScreen()
+        public HomeScreen(User currentUser = null)
         {
             InitializeComponent();
             _userService = new UserService();
@@ -29,6 +30,21 @@ namespace MusicPlayerUI
             _artistService = new ArtistService();
             _albumService = new AlbumService();
             _genreService = new GenreService();
+
+            // Set current user information
+            if (currentUser != null)
+            {
+                _currentUser = currentUser;
+                _currentUserId = currentUser.UserId;
+
+                // Set up UI based on user role
+                ConfigureUIForUserRole(currentUser.RoleId);
+            }
+            else
+            {
+                // Guest mode - limited access
+                ConfigureUIForGuestMode();
+            }
 
             // Show the favorites view by default
             ShowView(FavoritesView);
@@ -39,6 +55,111 @@ namespace MusicPlayerUI
 
             // Set event handler for window closing to clean up resources
             this.Closing += HomeScreen_Closing;
+        }
+        private void ConfigureUIForUserRole(int roleId)
+        {
+            switch (roleId)
+            {
+                case 3: // Admin
+                    ConfigureUIForAdminRole();
+                    break;
+                case 2: // Artist
+                    ConfigureUIForArtistRole();
+                    break;
+                case 1: // User
+                default:
+                    ConfigureUIForUserRole();
+                    break;
+            }
+        }
+
+        private void ConfigureUIForAdminRole()
+        {
+            UserNameText.Text = _currentUser.Username;
+            RoleText.Text = "Admin";
+
+            AdminPanel.Visibility = Visibility.Visible;
+
+            AddSongButton.IsEnabled = true;
+            AddArtistButton.IsEnabled = true;
+            AddAlbumButton.IsEnabled = true;
+            DeleteButton.IsEnabled = true;
+            ManageUsersButton.IsEnabled = true;
+        }
+
+        private void ConfigureUIForArtistRole()
+        {
+            // Artists can manage their own content
+            UserNameText.Text = _currentUser.Username;
+            RoleText.Text = "Artist";
+
+            // Enable artist-specific controls
+            AdminPanel.Visibility = Visibility.Collapsed;
+
+            // Configure permissions
+            AddSongButton.IsEnabled = true;
+            AddArtistButton.IsEnabled = false;
+            AddAlbumButton.IsEnabled = true;
+            DeleteButton.IsEnabled = false;
+            ManageUsersButton.IsEnabled = false;
+
+            // Load only the artist's own content
+            LoadArtistSpecificContent();
+        }
+
+        private void ConfigureUIForUserRole()
+        {
+            // Regular users have basic access
+            UserNameText.Text = _currentUser.Username;
+            RoleText.Text = "User";
+
+            // Configure UI for standard user
+            AdminPanel.Visibility = Visibility.Collapsed;
+
+            // Disable management controls
+            AddSongButton.IsEnabled = false;
+            AddArtistButton.IsEnabled = false;
+            AddAlbumButton.IsEnabled = false;
+            DeleteButton.IsEnabled = false;
+            ManageUsersButton.IsEnabled = false;
+        }
+
+        private void ConfigureUIForGuestMode()
+        {
+            UserNameText.Text = "Guest";
+            RoleText.Text = "Guest";
+
+            AdminPanel.Visibility = Visibility.Collapsed;
+
+            AddSongButton.IsEnabled = false;
+            AddArtistButton.IsEnabled = false;
+            AddAlbumButton.IsEnabled = false;
+            DeleteButton.IsEnabled = false;
+            ManageUsersButton.IsEnabled = false;
+
+            CreatePlaylistButton.IsEnabled = false;
+            FavoriteButton.IsEnabled = false;
+        }
+
+        private void LoadArtistSpecificContent()
+        {
+            try
+            {
+                var artistRepository = ArtistRepository.Instance;
+                var userArtist = artistRepository.GetAllArtists()
+                    .FirstOrDefault(a => a.Name.Equals(_currentUser.Username, StringComparison.OrdinalIgnoreCase));
+
+                if (userArtist != null)
+                {
+                    int artistId = userArtist.ArtistId;
+
+                    ShowArtistDetails(userArtist);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading artist content: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         #region View Navigation
@@ -625,6 +746,129 @@ namespace MusicPlayerUI
                 // Show a success message
                 MessageBox.Show("Song added successfully!", "Success",
                     MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        // Sign out functionality
+        private void SignOut_Click(object sender, RoutedEventArgs e)
+        {
+            // Clear current user information
+            App.Current.Properties["CurrentUser"] = null;
+            App.Current.Properties["UserRole"] = null;
+
+            // Return to sign-in screen
+            SignInScreen signInScreen = new SignInScreen(new UserService());
+            signInScreen.Show();
+            this.Close();
+        }
+
+        // Admin functionality
+        private void ManageUsers_Click(object sender, RoutedEventArgs e)
+        {
+            // Check if user has admin role
+            if (_currentUser != null && _currentUser.RoleId == 3)
+            {
+                // TODO: Open user management window
+                MessageBox.Show("User management functionality will be implemented in a future update.",
+                    "Coming Soon", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("You don't have permission to access this feature.",
+                    "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            // Check if user has admin role
+            if (_currentUser != null && _currentUser.RoleId == 3)
+            {
+                // TODO: Open content deletion window
+                MessageBox.Show("Content deletion functionality will be implemented in a future update.",
+                    "Coming Soon", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("You don't have permission to access this feature.",
+                    "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        // Artist related functionality
+        private void AddArtistButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Check if user has admin role or artist role
+            if (_currentUser != null && (_currentUser.RoleId == 3 || _currentUser.RoleId == 2))
+            {
+                var addArtistWindow = new AddArtistWindow(_artistService);
+                if (addArtistWindow.ShowDialog() == true)
+                {
+                    // Refresh the artists view
+                    LoadArtists();
+                }
+            }
+            else
+            {
+                MessageBox.Show("You don't have permission to add artists.",
+                    "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void AddAlbumButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Check if user has admin role or artist role
+            if (_currentUser != null && (_currentUser.RoleId == 3 || _currentUser.RoleId == 2))
+            {
+                var addAlbumWindow = new AddAlbumWindow(_albumService, _artistService);
+                if (addAlbumWindow.ShowDialog() == true)
+                {
+                    // Refresh relevant views
+                    LoadArtists();
+                }
+            }
+            else
+            {
+                MessageBox.Show("You don't have permission to add albums.",
+                    "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        // User functionality
+        private void CreatePlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser == null)
+            {
+                MessageBox.Show("You need to sign in to create playlists.",
+                    "Sign In Required", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // TODO: Open create playlist dialog
+            MessageBox.Show("Playlist creation functionality will be implemented in a future update.",
+                "Coming Soon", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void Favorite_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser == null)
+            {
+                MessageBox.Show("You need to sign in to add favorites.",
+                    "Sign In Required", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Song currentSong = _songService.GetCurrentSong();
+            if (currentSong != null)
+            {
+                // TODO: Add song to favorites
+                MessageBox.Show($"'{currentSong.Title}' has been added to your favorites.",
+                    "Added to Favorites", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("No song is currently playing.",
+                    "No Song Selected", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
