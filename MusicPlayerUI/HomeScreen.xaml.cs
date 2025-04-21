@@ -336,18 +336,27 @@ namespace MusicPlayerUI
             try
             {
                 ArtistsPanel.Children.Clear();
+
+                // Add diagnostic logging
+                Console.WriteLine("Attempting to load artists...");
                 List<Artist> artists = _artistService.GetAllArtists();
+                Console.WriteLine($"Retrieved {artists?.Count ?? 0} artists from service");
+
+                if (artists == null || artists.Count == 0)
+                {
+                    MessageBox.Show("No artists found in the database.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
 
                 foreach (var artist in artists)
                 {
-                    // Create an artist card
                     Border artistCard = CreateArtistCard(artist);
                     ArtistsPanel.Children.Add(artistCard);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading artists: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error loading artists: {ex.Message}\nStack Trace: {ex.StackTrace}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

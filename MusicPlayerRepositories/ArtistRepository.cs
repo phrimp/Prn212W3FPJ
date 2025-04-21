@@ -1,4 +1,5 @@
-﻿using MusicPlayerEntities;
+﻿using Microsoft.EntityFrameworkCore;
+using MusicPlayerEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,9 +35,18 @@ namespace MusicPlayerRepositories
 
         public List<Artist> GetAllArtists()
         {
-            return _dbContext.Artists
-                .OrderBy(a => a.Name)
-                .ToList();
+            try
+            {
+                return _dbContext.Artists
+            .AsNoTracking()  // Add this line
+            .OrderBy(a => a.Name)
+            .ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetAllArtists: {ex.Message}");
+                return new List<Artist>();
+            }
         }
 
         public void AddNewArtist(Artist artist)
