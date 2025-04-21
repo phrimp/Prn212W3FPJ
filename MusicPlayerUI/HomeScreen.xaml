@@ -51,50 +51,6 @@
                 </Button>
             </StackPanel>
         </Grid>
-        
-        <!-- Add admin management buttons -->
-        <Border x:Name="AdminPanel" Visibility="Collapsed" Margin="0,20,0,0">
-            <StackPanel>
-                <TextBlock Text="ADMINISTRATION" Foreground="#808080" FontWeight="Bold" Margin="20,0,0,10"/>
-
-                <Button x:Name="ManageUsersButton" Height="40" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Click="ManageUsers_Click">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="👥" FontSize="16" Foreground="#E0E0E0" Width="30" TextAlignment="Center"/>
-                        <TextBlock Text="Manage Users" Foreground="#E0E0E0" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-
-                <Button x:Name="DeleteButton" Height="40" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Click="Delete_Click">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="🗑️" FontSize="16" Foreground="#E0E0E0" Width="30" TextAlignment="Center"/>
-                        <TextBlock Text="Delete Content" Foreground="#E0E0E0" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Border>
-
-        <Button x:Name="AddArtistButton" Height="40" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Click="AddArtistButton_Click">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="🎤" FontSize="16" Foreground="#E0E0E0" Width="30" TextAlignment="Center"/>
-                <TextBlock Text="Add Artist" Foreground="#E0E0E0" VerticalAlignment="Center"/>
-            </StackPanel>
-        </Button>
-
-        <Button x:Name="AddAlbumButton" Height="40" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Click="AddAlbumButton_Click">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="💿" FontSize="16" Foreground="#E0E0E0" Width="30" TextAlignment="Center"/>
-                <TextBlock Text="Add Album" Foreground="#E0E0E0" VerticalAlignment="Center"/>
-            </StackPanel>
-        </Button>
-
-        <Button x:Name="CreatePlaylistButton" Height="40" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Click="CreatePlaylist_Click">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="+" FontSize="16" Foreground="#E0E0E0" Width="30" TextAlignment="Center"/>
-                <TextBlock Text="Create Playlist" Foreground="#E0E0E0" VerticalAlignment="Center"/>
-            </StackPanel>
-        </Button>
-
-        <Button x:Name="FavoriteButton" Content="♥" FontSize="18" Foreground="#1DB954" Background="Transparent" BorderThickness="0" Margin="15,0,0,0" Padding="10,0" Click="Favorite_Click"/>
 
         <!-- Main Content Area -->
         <Grid Grid.Row="1">
@@ -106,6 +62,52 @@
             <!-- Navigation Panel -->
             <Grid Grid.Column="0" Background="#252525">
                 <StackPanel Margin="0,20,0,0">
+                    <!-- Admin Panel Section -->
+                    <Border x:Name="AdminPanel" Visibility="Collapsed">
+                        <StackPanel>
+                            <TextBlock Text="ADMINISTRATION" Foreground="#808080" FontWeight="Bold" Margin="20,0,0,10"/>
+
+                            <Button x:Name="ManageUsersButton" Height="40" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Click="ManageUsers_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="👥" FontSize="16" Foreground="#E0E0E0" Width="30" TextAlignment="Center"/>
+                                    <TextBlock Text="Manage Users" Foreground="#E0E0E0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button x:Name="DeleteButton" Height="40" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Click="Delete_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="🗑️" FontSize="16" Foreground="#E0E0E0" Width="30" TextAlignment="Center"/>
+                                    <TextBlock Text="Delete Content" Foreground="#E0E0E0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Content Management Section -->
+                    <StackPanel Margin="0,0,0,20">
+                        <Button x:Name="AddSongButton" Height="40" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Click="AddSongButton_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🎵" FontSize="16" Foreground="#E0E0E0" Width="30" TextAlignment="Center"/>
+                                <TextBlock Text="Add Song" Foreground="#E0E0E0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="AddArtistButton" Height="40" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Click="AddArtistButton_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🎤" FontSize="16" Foreground="#E0E0E0" Width="30" TextAlignment="Center"/>
+                                <TextBlock Text="Add Artist" Foreground="#E0E0E0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="AddAlbumButton" Height="40" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Click="AddAlbumButton_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="💿" FontSize="16" Foreground="#E0E0E0" Width="30" TextAlignment="Center"/>
+                                <TextBlock Text="Add Album" Foreground="#E0E0E0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Library Section -->
                     <TextBlock Text="LIBRARY" Foreground="#808080" FontWeight="Bold" Margin="20,0,0,10"/>
 
                     <Button x:Name="HomeButton" Height="40" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Click="HomeButton_Click">
@@ -138,7 +140,7 @@
 
                     <TextBlock Text="PLAYLISTS" Foreground="#808080" FontWeight="Bold" Margin="20,20,0,10"/>
 
-                    <Button Height="40" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left">
+                    <Button x:Name="CreatePlaylistButton" Height="40" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Click="CreatePlaylist_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="+" FontSize="16" Foreground="#E0E0E0" Width="30" TextAlignment="Center"/>
                             <TextBlock Text="Create Playlist" Foreground="#E0E0E0" VerticalAlignment="Center"/>
@@ -160,7 +162,278 @@
 
                 <!-- Home View (Default) -->
                 <Grid x:Name="HomeView" Visibility="Collapsed">
-                    <TextBlock Text="Home View" Foreground="White" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="20,20,20,0">
+                            <!-- Welcome Section -->
+                            <TextBlock Text="Home" Foreground="White" FontSize="32" FontWeight="Bold" Margin="0,0,0,20"/>
+
+                            <!-- Top Songs Section -->
+                            <Grid Margin="0,0,0,30">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Section Header -->
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Text="Top Songs" Foreground="White" FontSize="20" FontWeight="SemiBold"/>
+                                    <Button Grid.Column="1" Content="See All" Foreground="#1DB954" Background="Transparent" BorderThickness="0"/>
+                                </Grid>
+
+                                <!-- Songs List -->
+                                <ListBox Grid.Row="1" x:Name="TopSongsList" Margin="0,10,0,0" Background="Transparent" BorderThickness="0"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0,0,15,15"/>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+
+                                    <!-- Sample Items - Will be populated programmatically -->
+                                    <Border Width="200" Height="250" Background="#252525" CornerRadius="6">
+                                        <StackPanel>
+                                            <Border Width="175" Height="175" Background="#333333" Margin="0,12,0,8" CornerRadius="4">
+                                                <TextBlock Text="♫" FontSize="70" Foreground="#1DB954" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="Falling Stars" Foreground="White" FontSize="14" FontWeight="SemiBold" Margin="12,0,12,0"/>
+                                            <TextBlock Text="Luna Carter" Foreground="#B3B3B3" FontSize="12" Margin="12,4,12,0"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Width="200" Height="250" Background="#252525" CornerRadius="6">
+                                        <StackPanel>
+                                            <Border Width="175" Height="175" Background="#333333" Margin="0,12,0,8" CornerRadius="4">
+                                                <TextBlock Text="♫" FontSize="70" Foreground="#1DB954" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="Ocean Waves" Foreground="White" FontSize="14" FontWeight="SemiBold" Margin="12,0,12,0"/>
+                                            <TextBlock Text="The Soundwaves" Foreground="#B3B3B3" FontSize="12" Margin="12,4,12,0"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Width="200" Height="250" Background="#252525" CornerRadius="6">
+                                        <StackPanel>
+                                            <Border Width="175" Height="175" Background="#333333" Margin="0,12,0,8" CornerRadius="4">
+                                                <TextBlock Text="♫" FontSize="70" Foreground="#1DB954" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="Mountain High" Foreground="White" FontSize="14" FontWeight="SemiBold" Margin="12,0,12,0"/>
+                                            <TextBlock Text="The Soundwaves" Foreground="#B3B3B3" FontSize="12" Margin="12,4,12,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                </ListBox>
+                            </Grid>
+
+                            <!-- Top Albums Section -->
+                            <Grid Margin="0,0,0,30">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Section Header -->
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Text="Top Albums" Foreground="White" FontSize="20" FontWeight="SemiBold"/>
+                                    <Button Grid.Column="1" Content="See All" Foreground="#1DB954" Background="Transparent" BorderThickness="0"/>
+                                </Grid>
+
+                                <!-- Albums List -->
+                                <ListBox Grid.Row="1" x:Name="TopAlbumsList" Margin="0,10,0,0" Background="Transparent" BorderThickness="0"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0,0,15,15"/>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+
+                                    <!-- Sample Items - Will be populated programmatically -->
+                                    <Border Width="200" Height="250" Background="#252525" CornerRadius="6">
+                                        <StackPanel>
+                                            <Border Width="175" Height="175" Background="#333333" Margin="0,12,0,8" CornerRadius="4">
+                                                <TextBlock Text="💿" FontSize="70" Foreground="#1DB954" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="Midnight Echoes" Foreground="White" FontSize="14" FontWeight="SemiBold" Margin="12,0,12,0"/>
+                                            <TextBlock Text="The Soundwaves" Foreground="#B3B3B3" FontSize="12" Margin="12,4,12,0"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Width="200" Height="250" Background="#252525" CornerRadius="6">
+                                        <StackPanel>
+                                            <Border Width="175" Height="175" Background="#333333" Margin="0,12,0,8" CornerRadius="4">
+                                                <TextBlock Text="💿" FontSize="70" Foreground="#1DB954" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="Starlight" Foreground="White" FontSize="14" FontWeight="SemiBold" Margin="12,0,12,0"/>
+                                            <TextBlock Text="Luna Carter" Foreground="#B3B3B3" FontSize="12" Margin="12,4,12,0"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Width="200" Height="250" Background="#252525" CornerRadius="6">
+                                        <StackPanel>
+                                            <Border Width="175" Height="175" Background="#333333" Margin="0,12,0,8" CornerRadius="4">
+                                                <TextBlock Text="💿" FontSize="70" Foreground="#1DB954" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="Urban Poetry" Foreground="White" FontSize="14" FontWeight="SemiBold" Margin="12,0,12,0"/>
+                                            <TextBlock Text="Rhythm Collective" Foreground="#B3B3B3" FontSize="12" Margin="12,4,12,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                </ListBox>
+                            </Grid>
+
+                            <!-- Popular Artists Section -->
+                            <Grid Margin="0,0,0,30">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Section Header -->
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Text="Popular Artists" Foreground="White" FontSize="20" FontWeight="SemiBold"/>
+                                    <Button Grid.Column="1" Content="See All" Foreground="#1DB954" Background="Transparent" BorderThickness="0"/>
+                                </Grid>
+
+                                <!-- Artists List -->
+                                <ListBox Grid.Row="1" x:Name="PopularArtistsList" Margin="0,10,0,0" Background="Transparent" BorderThickness="0"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0,0,20,15"/>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+
+                                    <!-- Sample Items - Will be populated programmatically -->
+                                    <StackPanel Width="170" Height="220">
+                                        <Border Width="170" Height="170" Background="#333333" CornerRadius="85">
+                                            <TextBlock Text="T" FontSize="80" Foreground="#1DB954" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="The Soundwaves" Foreground="White" FontSize="14" FontWeight="SemiBold" TextAlignment="Center" Margin="0,10,0,0"/>
+                                    </StackPanel>
+
+                                    <StackPanel Width="170" Height="220">
+                                        <Border Width="170" Height="170" Background="#333333" CornerRadius="85">
+                                            <TextBlock Text="L" FontSize="80" Foreground="#1DB954" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="Luna Carter" Foreground="White" FontSize="14" FontWeight="SemiBold" TextAlignment="Center" Margin="0,10,0,0"/>
+                                    </StackPanel>
+
+                                    <StackPanel Width="170" Height="220">
+                                        <Border Width="170" Height="170" Background="#333333" CornerRadius="85">
+                                            <TextBlock Text="R" FontSize="80" Foreground="#1DB954" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="Rhythm Collective" Foreground="White" FontSize="14" FontWeight="SemiBold" TextAlignment="Center" Margin="0,10,0,0"/>
+                                    </StackPanel>
+                                </ListBox>
+                            </Grid>
+
+                            <!-- Recently Played Section -->
+                            <Grid Margin="0,0,0,30">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Section Header -->
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Text="Recently Played" Foreground="White" FontSize="20" FontWeight="SemiBold"/>
+                                    <Button Grid.Column="1" Content="See All" Foreground="#1DB954" Background="Transparent" BorderThickness="0"/>
+                                </Grid>
+
+                                <!-- Recent Songs List -->
+                                <ListView Grid.Row="1" x:Name="RecentlyPlayedList" Margin="0,10,0,0" Background="Transparent" BorderThickness="0" Foreground="White" MaxHeight="250">
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="Padding" Value="5" />
+                                            <Setter Property="BorderThickness" Value="0" />
+                                            <Style.Triggers>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter Property="Background" Value="#333333" />
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#2A2A2A" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.View>
+                                        <GridView AllowsColumnReorder="False">
+                                            <GridViewColumn Header="TITLE" Width="250">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Title}" VerticalAlignment="Center" Foreground="White" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="ARTIST" Width="200">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Artist}" VerticalAlignment="Center" Foreground="White" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="ALBUM" Width="200">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Album}" VerticalAlignment="Center" Foreground="White" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="LAST PLAYED" Width="150">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding LastPlayed}" VerticalAlignment="Center" Foreground="White" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
                 </Grid>
 
                 <!-- My Music View -->
@@ -268,17 +541,6 @@
                                     </Button>
                                 </Grid>
 
-                                <Button x:Name="AddSongButton" Content="Add Song" Width="120" Height="40" 
-        Background="#1DB954" Foreground="White" BorderThickness="0" 
-        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,20,0"
-        Click="AddSongButton_Click">
-                                    <Button.Resources>
-                                        <Style TargetType="Border">
-                                            <Setter Property="CornerRadius" Value="20"/>
-                                        </Style>
-                                    </Button.Resources>
-                                </Button>
-                                
                                 <!-- Artists Grid -->
                                 <WrapPanel Grid.Row="1" x:Name="ArtistsPanel" Orientation="Horizontal">
                                     <!-- Artists will be added here programmatically -->
@@ -320,6 +582,8 @@
                             <TextBlock x:Name="PlaylistNameText" Foreground="White" FontSize="32" FontWeight="Bold" Margin="0,5,0,10" Text="Favorites"/>
                             <TextBlock x:Name="PlaylistInfoText" Text="125 songs • 8 hours 42 minutes" Foreground="#808080" FontSize="14"/>
                         </StackPanel>
+
+                        <Button x:Name="FavoriteButton" Grid.Column="2" Content="♥" FontSize="18" Foreground="#1DB954" Background="Transparent" BorderThickness="0" Margin="0,0,0,0" Padding="10,0" Click="Favorite_Click"/>
                     </Grid>
 
                     <!-- Song List -->

@@ -31,31 +31,26 @@ namespace MusicPlayerUI
             _albumService = new AlbumService();
             _genreService = new GenreService();
 
-            // Set current user information
             if (currentUser != null)
             {
                 _currentUser = currentUser;
                 _currentUserId = currentUser.UserId;
 
-                // Set up UI based on user role
                 ConfigureUIForUserRole(currentUser.RoleId);
             }
             else
             {
-                // Guest mode - limited access
                 ConfigureUIForGuestMode();
             }
 
-            // Show the favorites view by default
-            ShowView(FavoritesView);
-            FavoritesButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3E3E3E"));
+            InitializeHomeView();
 
             LoadFavorites();
             InitializeProgressTimer();
 
-            // Set event handler for window closing to clean up resources
             this.Closing += HomeScreen_Closing;
         }
+
         private void ConfigureUIForUserRole(int roleId)
         {
             switch (roleId)
@@ -182,11 +177,6 @@ namespace MusicPlayerUI
             viewToShow.Visibility = Visibility.Visible;
         }
 
-        private void HomeButton_Click(object sender, RoutedEventArgs e)
-        {
-            ShowView(HomeView);
-            HomeButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3E3E3E"));
-        }
 
         private void MyMusicButton_Click(object sender, RoutedEventArgs e)
         {
@@ -870,6 +860,360 @@ namespace MusicPlayerUI
                 MessageBox.Show("No song is currently playing.",
                     "No Song Selected", MessageBoxButton.OK, MessageBoxImage.Information);
             }
+        }
+
+        private void LoadHomeViewContent()
+        {
+            try
+            {
+                LoadTopSongs();
+                LoadTopAlbums();
+                LoadPopularArtists();
+                LoadRecentlyPlayed();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading home view: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Load top songs based on play count
+        private void LoadTopSongs()
+        {
+            try
+            {
+                TopSongsList.Items.Clear();
+
+                // Get all songs and order by play count
+                var allSongs = _songService.GetAll();
+                var topSongs = allSongs
+                    .OrderByDescending(s => s.PlayCount ?? 0)
+                    .Take(10)
+                    .ToList();
+
+                foreach (var song in topSongs)
+                {
+                    // Create song card
+                    Border songCard = CreateSongCard(song);
+                    TopSongsList.Items.Add(songCard);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading top songs: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Create a song card for the Top Songs list
+        private Border CreateSongCard(Song song)
+        {
+            Border card = new Border
+            {
+                Width = 200,
+                Height = 250,
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#252525")),
+                CornerRadius = new CornerRadius(6)
+            };
+
+            StackPanel content = new StackPanel();
+
+            // Song thumbnail
+            Border thumbnail = new Border
+            {
+                Width = 175,
+                Height = 175,
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#333333")),
+                Margin = new Thickness(0, 12, 0, 8),
+                CornerRadius = new CornerRadius(4)
+            };
+
+            TextBlock icon = new TextBlock
+            {
+                Text = "♫",
+                FontSize = 70,
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1DB954")),
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+
+            thumbnail.Child = icon;
+            content.Children.Add(thumbnail);
+
+            // Song title
+            TextBlock titleText = new TextBlock
+            {
+                Text = song.Title,
+                Foreground = new SolidColorBrush(Colors.White),
+                FontSize = 14,
+                FontWeight = FontWeights.SemiBold,
+                Margin = new Thickness(12, 0, 12, 0),
+                TextTrimming = TextTrimming.CharacterEllipsis
+            };
+            content.Children.Add(titleText);
+
+            // Artist name
+            TextBlock artistText = new TextBlock
+            {
+                Text = song.Artist?.Name ?? "Unknown Artist",
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#B3B3B3")),
+                FontSize = 12,
+                Margin = new Thickness(12, 4, 12, 0),
+                TextTrimming = TextTrimming.CharacterEllipsis
+            };
+            content.Children.Add(artistText);
+
+            card.Child = content;
+
+            // Add click event to play the song
+            card.MouseLeftButtonUp += (s, e) => {
+                _songService.PlaySong(song);
+                UpdateNowPlayingInfo();
+                PlayBtn.Content = "❚❚";
+            };
+
+            return card;
+        }
+
+        // Load top albums
+        private void LoadTopAlbums()
+        {
+            try
+            {
+                TopAlbumsList.Items.Clear();
+
+                // Get all albums
+                var allAlbums = _albumService.GetAll();
+
+                // Take up to 10 albums (or fewer if we don't have 10)
+                var displayAlbums = allAlbums.Take(10).ToList();
+
+                foreach (var album in displayAlbums)
+                {
+                    // Create album card
+                    Border albumCard = CreateAlbumCard(album);
+                    TopAlbumsList.Items.Add(albumCard);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading top albums: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Create an album card
+        private Border CreateAlbumCard(Album album)
+        {
+            Border card = new Border
+            {
+                Width = 200,
+                Height = 250,
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#252525")),
+                CornerRadius = new CornerRadius(6)
+            };
+
+            StackPanel content = new StackPanel();
+
+            // Album cover
+            Border cover = new Border
+            {
+                Width = 175,
+                Height = 175,
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#333333")),
+                Margin = new Thickness(0, 12, 0, 8),
+                CornerRadius = new CornerRadius(4)
+            };
+
+            TextBlock icon = new TextBlock
+            {
+                Text = "💿",
+                FontSize = 70,
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1DB954")),
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+
+            cover.Child = icon;
+            content.Children.Add(cover);
+
+            // Album title
+            TextBlock titleText = new TextBlock
+            {
+                Text = album.Title,
+                Foreground = new SolidColorBrush(Colors.White),
+                FontSize = 14,
+                FontWeight = FontWeights.SemiBold,
+                Margin = new Thickness(12, 0, 12, 0),
+                TextTrimming = TextTrimming.CharacterEllipsis
+            };
+            content.Children.Add(titleText);
+
+            // Artist name
+            TextBlock artistText = new TextBlock
+            {
+                Text = album.Artist?.Name ?? "Unknown Artist",
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#B3B3B3")),
+                FontSize = 12,
+                Margin = new Thickness(12, 4, 12, 0),
+                TextTrimming = TextTrimming.CharacterEllipsis
+            };
+            content.Children.Add(artistText);
+
+            card.Child = content;
+
+            // Add click event to show album details
+            card.MouseLeftButtonUp += (s, e) => {
+                // TODO: Implement album detail view
+                MessageBox.Show($"Album: {album.Title}", "Album Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+            };
+
+            return card;
+        }
+
+        // Load popular artists
+        private void LoadPopularArtists()
+        {
+            try
+            {
+                PopularArtistsList.Items.Clear();
+
+                // Get all artists
+                var allArtists = _artistService.GetAllArtists();
+
+                // For now, just display the first 10 artists
+                // In a real app, you would determine popularity based on metrics
+                var popularArtists = allArtists.Take(10).ToList();
+
+                foreach (var artist in popularArtists)
+                {
+                    // Create artist card
+                    var artistCard = CreateArtistCardForHome(artist);
+                    PopularArtistsList.Items.Add(artistCard);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading popular artists: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Create an artist card specifically for the home view
+        private StackPanel CreateArtistCardForHome(Artist artist)
+        {
+            StackPanel card = new StackPanel
+            {
+                Width = 170,
+                Height = 220
+            };
+
+            // Artist avatar
+            Border avatar = new Border
+            {
+                Width = 170,
+                Height = 170,
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#333333")),
+                CornerRadius = new CornerRadius(85)
+            };
+
+            // Initial letter
+            TextBlock initial = new TextBlock
+            {
+                Text = !string.IsNullOrEmpty(artist.Name) ? artist.Name[0].ToString().ToUpper() : "A",
+                FontSize = 80,
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1DB954")),
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+
+            avatar.Child = initial;
+            card.Children.Add(avatar);
+
+            // Artist Name
+            TextBlock nameText = new TextBlock
+            {
+                Text = artist.Name,
+                Foreground = new SolidColorBrush(Colors.White),
+                FontSize = 14,
+                FontWeight = FontWeights.SemiBold,
+                TextAlignment = TextAlignment.Center,
+                Margin = new Thickness(0, 10, 0, 0),
+                TextTrimming = TextTrimming.CharacterEllipsis
+            };
+            card.Children.Add(nameText);
+
+            // Add click event to show artist details
+            card.MouseLeftButtonUp += (s, e) => ShowArtistDetails(artist);
+
+            return card;
+        }
+
+        // Load recently played songs
+        private void LoadRecentlyPlayed()
+        {
+            try
+            {
+                RecentlyPlayedList.Items.Clear();
+
+                // In a real app, you would get this from the listening history
+                // For now, we'll just display some sample data
+                var songs = _songService.GetAll();
+
+                if (songs.Count > 0)
+                {
+                    int index = 1;
+                    foreach (Song song in songs.Take(5))
+                    {
+                        // Create a view model for binding
+                        var recentSong = new RecentlyPlayedViewModel
+                        {
+                            Title = song.Title,
+                            Artist = song.Artist?.Name ?? "Unknown Artist",
+                            Album = song.Album?.Title ?? "Unknown Album",
+                            LastPlayed = "Today", // In a real app, get this from listening history
+                            SongData = song
+                        };
+
+                        RecentlyPlayedList.Items.Add(recentSong);
+                        index++;
+
+                        // Only show 5 items for now
+                        if (index > 5) break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading recently played: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Update the HomeButton_Click method to call LoadHomeViewContent
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowView(HomeView);
+            HomeButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3E3E3E"));
+            LoadHomeViewContent();
+        }
+
+        // Modify the constructor to show HomeView on startup
+        // This would go in your existing constructor after initialization
+        private void InitializeHomeView()
+        {
+            // Show the HomeView by default instead of Favorites
+            ShowView(HomeView);
+            HomeButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3E3E3E"));
+
+            // Load the home view content
+            LoadHomeViewContent();
+        }
+
+        // ViewModel for recently played items
+        public class RecentlyPlayedViewModel
+        {
+            public string Title { get; set; }
+            public string Artist { get; set; }
+            public string Album { get; set; }
+            public string LastPlayed { get; set; }
+            public Song SongData { get; set; }
         }
 
         // ViewModel for song display in ListView
