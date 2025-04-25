@@ -28,28 +28,127 @@ namespace MusicPlayerUI
         private readonly ArtistService _artistService;
         private readonly AlbumService _albumService;
         private readonly GenreService _genreService;
+        private readonly UserService _userService; // Add reference to UserService
         private string _selectedFilePath;
         private int _fileDuration;
         private readonly string _targetDirectory;
+        private readonly int _currentUserRole;
+        private readonly string _currentUsername;
+        private Artist _currentArtist; // To store the artist for role 2 users
 
-        public AddSongWindow(SongService songService, ArtistService artistService, AlbumService albumService, GenreService genreService)
+        public AddSongWindow(SongService songService, ArtistService artistService, 
+            AlbumService albumService, GenreService genreService, 
+            int userRole, string username, UserService userService)
         {
-            InitializeComponent();
+            InitializeComponent(); // Ensure this is called first
+            
             _songService = songService;
             _artistService = artistService;
             _albumService = albumService;
             _genreService = genreService;
+            _userService = userService;
+            _currentUserRole = userRole;
+            _currentUsername = username;
 
-            //Songs Directory
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            _targetDirectory = Path.Combine(baseDirectory, "..", "..", "..", "Assets", "Songs");
-            Directory.CreateDirectory(_targetDirectory);
-
-            LoadArtists();
-            LoadAlbums();
-            LoadGenres();
+            // Use a more reliable path resolution
+            try 
+            {
+                string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                string assetsPath = Path.GetFullPath(Path.Combine(baseDirectory, "..", "..", "..", "Assets", "Songs"));
+                
+                // Fallback to user music folder if the project path isn't accessible
+                if (!Directory.Exists(Path.GetDirectoryName(assetsPath)))
+                {
+                    _targetDirectory = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.MyMusic),
+                        "MusicPlayerApp");
+                }
+                else
+                {
+                    _targetDirectory = assetsPath;
+                }
+                
+                Directory.CreateDirectory(_targetDirectory);
+                Console.WriteLine($"Song storage directory: {_targetDirectory}");
+            }
+            catch (Exception ex)
+            {
+                // Fallback to a safe directory if path resolution fails
+                _targetDirectory = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyMusic),
+                    "MusicPlayerApp");
+                Directory.CreateDirectory(_targetDirectory);
+                MessageBox.Show($"Using fallback directory: {_targetDirectory}", "Path Resolution Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
 
             ReleaseDatePicker.SelectedDate = DateTime.Today;
+            
+            // Make sure UI is loaded before configuring fields
+            Loaded += (s, e) => {
+                ConfigureArtistField();
+                LoadAlbums();
+                LoadGenres();
+            };
+        }
+
+        private void ConfigureArtistField()
+        {
+            try 
+            {
+                if (ArtistComboBox == null)
+                {
+                    MessageBox.Show("ArtistComboBox is not initialized", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                
+                if (_currentUserRole == 2) // Artist role
+                {
+                    // Find or create artist associated with this username
+                    _currentArtist = _artistService.GetArtistByUsername(_currentUsername);
+                    if (_currentArtist == null)
+                    {
+                        // Create new artist based on username
+                        _currentArtist = new Artist
+                        {
+                            Name = _currentUsername,
+                            Bio = string.Empty
+                        };
+                        _artistService.AddNewArtist(_currentArtist);
+                    }
+
+                    // Disable artist selection and set to current artist
+                    ArtistComboBox.IsEnabled = false;
+                    ArtistComboBox.IsEditable = false;
+                    
+                    // Set up the ComboBox with just this artist
+                    var singleArtistList = new List<Artist> { _currentArtist };
+                    ArtistComboBox.ItemsSource = singleArtistList;
+                    ArtistComboBox.DisplayMemberPath = "Name";
+                    ArtistComboBox.SelectedValuePath = "ArtistId";
+                    ArtistComboBox.SelectedItem = _currentArtist;
+                    
+                    // Hide the "+" button for adding artists if it exists
+                    var addArtistButton = this.FindName("NewArtistButton") as Button;
+                    if (addArtistButton != null)
+                    {
+                        addArtistButton.Visibility = Visibility.Collapsed;
+                    }
+                }
+                else if (_currentUserRole == 3) // Admin role
+                {
+                    // Admin can select from all artists or create new ones
+                    LoadArtists();
+                }
+                else
+                {
+                    // Default behavior for other roles
+                    LoadArtists();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error configuring artist field: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void LoadArtists()
@@ -71,8 +170,18 @@ namespace MusicPlayerUI
         {
             try
             {
-                var albums = _albumService.GetAll();
-                AlbumComboBox.ItemsSource = albums;
+                // For artists, only show their albums
+                if (_currentUserRole == 2 && _currentArtist != null)
+                {
+                    var albums = _albumService.GetByArtistId(_currentArtist.ArtistId);
+                    AlbumComboBox.ItemsSource = albums;
+                }
+                else
+                {
+                    var albums = _albumService.GetAll();
+                    AlbumComboBox.ItemsSource = albums;
+                }
+                
                 AlbumComboBox.DisplayMemberPath = "Title";
                 AlbumComboBox.SelectedValuePath = "AlbumId";
             }
@@ -130,6 +239,7 @@ namespace MusicPlayerUI
 
         private void NewArtistButton_Click(object sender, RoutedEventArgs e)
         {
+            // This button should be hidden for role 2 users
             var newArtistWindow = new AddArtistWindow(_artistService);
             if (newArtistWindow.ShowDialog() == true)
             {
@@ -146,6 +256,7 @@ namespace MusicPlayerUI
                 }
             }
         }
+
         private void NewAlbumButton_Click(object sender, RoutedEventArgs e)
         {
             var newAlbumWindow = new AddAlbumWindow(_albumService, _artistService);
@@ -186,6 +297,13 @@ namespace MusicPlayerUI
                 if (string.IsNullOrWhiteSpace(_selectedFilePath))
                 {
                     ErrorMessageText.Text = "Please select an MP3 file.";
+                    return;
+                }
+
+                // Check if source file exists
+                if (!File.Exists(_selectedFilePath))
+                {
+                    ErrorMessageText.Text = "The selected file no longer exists.";
                     return;
                 }
 
@@ -235,11 +353,8 @@ namespace MusicPlayerUI
                     genreId = selectedGenre.GenreId;
                 }
 
-                string uniqueFileName = $"{Guid.NewGuid()}.mp3";
-                string targetFilePath = Path.Combine(_targetDirectory, uniqueFileName);
-
-                File.Copy(_selectedFilePath, targetFilePath, true);
-
+                // Create the song object passing the original file path
+                // The repository will handle copying the file
                 var newSong = new Song
                 {
                     Title = TitleTextBox.Text,
@@ -247,7 +362,7 @@ namespace MusicPlayerUI
                     AlbumId = albumId,
                     GenreId = genreId,
                     Duration = _fileDuration,
-                    FilePath = uniqueFileName,
+                    FilePath = _selectedFilePath, // Pass the complete file path
                     ReleaseDate = ReleaseDatePicker.SelectedDate.HasValue
                         ? DateOnly.FromDateTime(ReleaseDatePicker.SelectedDate.Value)
                         : null,
@@ -255,7 +370,7 @@ namespace MusicPlayerUI
                 };
 
                 _songService.Add(newSong);
-
+                
                 DialogResult = true;
             }
             catch (Exception ex)

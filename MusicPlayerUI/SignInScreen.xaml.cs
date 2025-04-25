@@ -88,8 +88,10 @@ namespace MusicPlayerUI
             string username = RegisterUsername.Text;
             string password = RegisterPassword.Password;
             string confirmPassword = RegisterConfirmPassword.Password;
+            string fullName = RegisterFullName.Text;
+            string profilePicture = RegisterProfilePicture.Text;
 
-            if (ValidateRegistration(email, username, password, confirmPassword))
+            if (ValidateRegistration(email, username, fullName, password, confirmPassword))
             {
                 try
                 {
@@ -99,6 +101,8 @@ namespace MusicPlayerUI
                         Email = email,
                         Username = username,
                         PasswordHash = password, // Will be encrypted in the repository
+                        FullName = fullName,
+                        ProfilePicture = profilePicture,
                         CreatedDate = DateTime.Now,
                         IsActive = true,
                         RoleId = 1 // Default role is User
@@ -119,12 +123,13 @@ namespace MusicPlayerUI
             }
         }
 
-        private bool ValidateRegistration(string email, string username, string password, string confirmPassword)
+        private bool ValidateRegistration(string email, string username, string fullName, string password, string confirmPassword)
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(username) ||
-                string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(confirmPassword))
+                string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(password) || 
+                string.IsNullOrWhiteSpace(confirmPassword))
             {
-                MessageBox.Show("All fields are required.", "Registration Error",
+                MessageBox.Show("Email, username, full name, and password are required.", "Registration Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }

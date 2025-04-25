@@ -27,5 +27,17 @@ namespace MusicPlayerServices
             => _artistRepository.GetAllArtists();
         public void AddNewArtist(Artist artist) => _artistRepository.AddNewArtist(artist);
         public List<Artist> GetArtistsOrderByName() => _artistRepository.GetArtistOrderByName();
+
+        public Artist GetArtistByUsername(string username)
+        {
+            // This implementation depends on how your data model connects users to artists
+            // Here's a simple implementation assuming artists have a Username property
+            return _artistRepository.GetAllArtists().FirstOrDefault(a => a.Name == username);
+        }
+
+        public List<Artist> GetAlbumsByArtistId(int artistId)
+        {
+            return _artistRepository.GetAllArtists().Where(a => a.ArtistId == artistId).ToList();
+        }
     }
 }

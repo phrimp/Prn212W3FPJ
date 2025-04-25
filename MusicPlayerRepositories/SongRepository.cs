@@ -60,8 +60,36 @@ namespace MusicPlayerRepositories
             Song? cur = GetOne(a.SongId);
             if (cur != null)
             {
-                throw new Exception();
+                throw new Exception("Song with this ID already exists");
             }
+
+            if (!string.IsNullOrEmpty(a.FilePath) && File.Exists(a.FilePath))
+            {
+                try
+                {
+                    string fileName = Path.GetFileName(a.FilePath);
+
+                    string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                    string destinationDirectory = Path.Combine(baseDirectory, "..", "..", "..", "Assets", "Songs");
+
+                    Directory.CreateDirectory(destinationDirectory);
+
+                    string destinationPath = Path.Combine(destinationDirectory, fileName);
+
+                    File.Copy(a.FilePath, destinationPath, true);
+
+                    a.FilePath = fileName;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Error copying song file: {ex.Message}");
+                }
+            }
+            else
+            {
+                throw new Exception("Song file does not exist or path is invalid");
+            }
+
             _dbContext.Songs.Add(a);
             _dbContext.SaveChanges();
         }
@@ -437,7 +465,7 @@ namespace MusicPlayerRepositories
             _dbContext.SaveChanges();
         }
 
-        
+
 
         public List<Song> SearchSongsByArtist(string searchTerm)
         {

@@ -736,7 +736,17 @@ namespace MusicPlayerUI
 
         private void AddSongButton_Click(object sender, RoutedEventArgs e)
         {
-            var addSongWindow = new AddSongWindow(_songService, _artistService, _albumService, _genreService);
+            // Pass all the required parameters including user role, username and userService
+            var addSongWindow = new AddSongWindow(
+                _songService, 
+                _artistService, 
+                _albumService, 
+                _genreService,
+                _currentUser.RoleId,       // User role
+                _currentUser.Username,     // Username
+                _userService               // UserService
+            );
+            
             if (addSongWindow.ShowDialog() == true)
             {
                 // Refresh the current view

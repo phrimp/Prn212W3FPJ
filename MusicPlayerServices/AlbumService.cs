@@ -15,5 +15,7 @@ namespace MusicPlayerServices
 
         public List<Album> GetAll() => albumRepository.GetAll();
         public void AddNewAlbum(Album album) => albumRepository.Add(album);
+
+        public List<Album> GetByArtistId(int id) => albumRepository.GetByArtistId(id);
     }
 }
