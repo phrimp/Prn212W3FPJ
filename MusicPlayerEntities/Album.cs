@@ -13,7 +13,7 @@ public partial class Album
 
     public int? ReleaseYear { get; set; }
 
-    public string CoverImageUrl { get; set; }
+    public string? CoverImageUrl { get; set; }
 
     public virtual Artist Artist { get; set; }
 
