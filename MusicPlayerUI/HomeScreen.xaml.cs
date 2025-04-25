@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -7,6 +8,7 @@ using System.Windows.Threading;
 using MusicPlayerEntities;
 using MusicPlayerRepositories;
 using MusicPlayerServices;
+using System.Windows.Input; // Add this to fix the MouseButtonEventArgs error
 
 namespace MusicPlayerUI
 {
@@ -21,6 +23,8 @@ namespace MusicPlayerUI
         private DispatcherTimer progressTimer;
         private Artist _selectedArtist;
         private User _currentUser;
+        private bool _userIsDraggingSlider = false;
+        private bool _wasPlayingBeforeDrag = false;
 
         public HomeScreen(User currentUser = null)
         {
@@ -46,7 +50,7 @@ namespace MusicPlayerUI
             InitializeHomeView();
 
             LoadFavorites();
-            InitializeProgressTimer();
+            SetupProgressTimer();
 
             this.Closing += HomeScreen_Closing;
         }
@@ -238,33 +242,30 @@ namespace MusicPlayerUI
 
         #region Progress Timer
 
-        private void InitializeProgressTimer()
+        private void SetupProgressTimer()
         {
             progressTimer = new DispatcherTimer();
-            progressTimer.Interval = TimeSpan.FromMilliseconds(500); // Update every 500ms
-            progressTimer.Tick += ProgressTimer_Tick;
-            progressTimer.Start();
-        }
-
-        private void ProgressTimer_Tick(object sender, EventArgs e)
-        {
-            UpdateProgressBar();
-        }
-
-        private void UpdateProgressBar()
-        {
-            if (_songService.GetPlaybackState() == NAudio.Wave.PlaybackState.Playing)
+            progressTimer.Interval = TimeSpan.FromMilliseconds(100); // Update 10 times per second
+            progressTimer.Tick += (s, e) => 
             {
-                float position = _songService.GetCurrentPosition();
-                float duration = _songService.GetCurrentDuration();
-
-                if (duration > 0)
+                if (!_userIsDraggingSlider && _songService.IsPlaying())
                 {
-                    // Calculate percentage and update progress bar
-                    double progressPercentage = (position / duration) * 100;
-                    SongProgressBar.Value = progressPercentage;
+                    double currentPosition = _songService.GetPlaybackPosition();
+                    double totalDuration = _songService.GetCurrentSongDuration();
+                    
+                    if (totalDuration > 0)
+                    {
+                        // Update slider
+                        double progressPercentage = (currentPosition / totalDuration) * 100;
+                        SongProgressSlider.Value = progressPercentage;
+                        
+                        // Update time display
+                        CurrentTimeText.Text = FormatTimeSpan(TimeSpan.FromSeconds(currentPosition));
+                        TotalTimeText.Text = FormatTimeSpan(TimeSpan.FromSeconds(totalDuration));
+                    }
                 }
-            }
+            };
+            progressTimer.Start();
         }
 
         private void HomeScreen_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -705,8 +706,8 @@ namespace MusicPlayerUI
                 song_name.Text = currentSong.Title;
                 song_artist.Text = currentSong.Artist?.Name ?? "Unknown Artist";
 
-                // Reset progress bar when song changes
-                SongProgressBar.Value = 0;
+                // Reset progress slider when song changes
+                SongProgressSlider.Value = 0;  // Changed from SongProgressBar to SongProgressSlider
             }
         }
 
@@ -1245,6 +1246,78 @@ namespace MusicPlayerUI
             public string Duration { get; set; }
             public string PlayCount { get; set; }
             public Song SongData { get; set; }
+        }
+
+        private void SongProgressSlider_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            _userIsDraggingSlider = true;
+            
+            // Check if music was playing and store that state
+            _wasPlayingBeforeDrag = _songService.IsPlaying();
+            
+            // Pause playback while dragging
+            if (_wasPlayingBeforeDrag)
+            {
+                _songService.PausePlayback();
+            }
+            
+            // Update the position immediately for single-click seeking
+            Point clickPoint = e.GetPosition(SongProgressSlider);
+            double sliderWidth = SongProgressSlider.ActualWidth;
+            
+            if (sliderWidth > 0)
+            {
+                double ratio = Math.Clamp(clickPoint.X / sliderWidth, 0, 1);
+                SongProgressSlider.Value = ratio * 100;
+            }
+        }
+
+        private void SongProgressSlider_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!_userIsDraggingSlider) return;
+            
+            // Get the new position as a percentage of the song duration
+            double newPositionPercent = SongProgressSlider.Value;
+            
+            // Convert to seconds
+            double newPositionSeconds = (_songService.GetCurrentSongDuration() * newPositionPercent) / 100;
+            
+            // Set the position in the audio player
+            _songService.SetPlaybackPosition(newPositionSeconds);
+            
+            // Resume playback if it was playing before
+            if (_wasPlayingBeforeDrag)
+            {
+                _songService.ResumePlayback();
+            }
+            
+            _userIsDraggingSlider = false;
+        }
+
+        private void SongProgressSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            // Only respond to user input, not programmatic updates
+            if (_userIsDraggingSlider)
+            {
+                // Update the current time display while dragging
+                UpdateTimeDisplay(SongProgressSlider.Value);
+            }
+        }
+
+        private void UpdateTimeDisplay(double progressPercentage)
+        {
+            double totalDuration = _songService.GetCurrentSongDuration();
+            double currentPosition = (totalDuration * progressPercentage) / 100;
+            
+            CurrentTimeText.Text = FormatTimeSpan(TimeSpan.FromSeconds(currentPosition));
+            TotalTimeText.Text = FormatTimeSpan(TimeSpan.FromSeconds(totalDuration));
+        }
+
+        private string FormatTimeSpan(TimeSpan time)
+        {
+            return time.Hours > 0 
+                ? $"{time.Hours}:{time.Minutes:D2}:{time.Seconds:D2}" 
+                : $"{time.Minutes}:{time.Seconds:D2}";
         }
     }
 }
