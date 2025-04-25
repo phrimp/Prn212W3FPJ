@@ -151,5 +151,25 @@ namespace MusicPlayerServices
             // Start playback of the first song
             _songRepository.PlayFromQueue();
         }
+
+        public double GetPlaybackPosition()
+        {
+            return _songRepository.GetPlaybackPosition();
+        }
+
+        public void SetPlaybackPosition(double seconds)
+        {
+            _songRepository.SetPlaybackPosition(seconds);
+        }
+
+        public double GetCurrentSongDuration()
+        {
+            return _songRepository.GetCurrentSongDuration();
+        }
+
+        public bool IsPlaying()
+        {
+            return _songRepository.IsPlaying();
+        }
     }
 }

@@ -135,6 +135,106 @@ namespace MusicPlayerRepositories
             return 0;
         }
 
+        // New methods for interactive timeline
+        public double GetPlaybackPosition()
+        {
+            if (currentAudioFile != null)
+            {
+                return currentAudioFile.CurrentTime.TotalSeconds;
+            }
+            return 0;
+        }
+
+        public void SetPlaybackPosition(double seconds)
+        {
+            if (currentAudioFile != null && outputDevice != null && currentSong != null)
+            {
+                try
+                {
+                    // Get current state
+                    bool wasPlaying = outputDevice.PlaybackState == PlaybackState.Playing;
+                    
+                    // For small seeks, try to use direct position setting instead of reloading
+                    if (Math.Abs(currentAudioFile.CurrentTime.TotalSeconds - seconds) < 30)
+                    {
+                        // Temporarily pause
+                        if (wasPlaying)
+                        {
+                            outputDevice.Pause();
+                        }
+                        
+                        // Set position (with bounds check)
+                        double totalSeconds = currentAudioFile.TotalTime.TotalSeconds;
+                        seconds = Math.Clamp(seconds, 0, totalSeconds - 0.5); // Stay a bit before the end
+                        currentAudioFile.CurrentTime = TimeSpan.FromSeconds(seconds);
+                        
+                        // Resume if needed
+                        if (wasPlaying)
+                        {
+                            outputDevice.Play();
+                        }
+                        
+                        return; // Skip the reinitialization
+                    }
+                    
+                    // For larger seeks, reinitialize to avoid potential buffering issues
+                    outputDevice.Stop();
+                    currentAudioFile.Dispose();
+                    
+                    // Re-initialize audio with new position
+                    string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                    string songPath = Path.Combine(baseDirectory, "..", "..", "..", "Assets", "Songs", currentSong.FilePath);
+                    
+                    // Verify file exists
+                    if (!File.Exists(Path.GetFullPath(songPath)))
+                    {
+                        Console.WriteLine($"Error: Audio file not found at {songPath}");
+                        return;
+                    }
+                    
+                    currentAudioFile = new AudioFileReader(songPath);
+                    outputDevice.Init(currentAudioFile);
+                    
+                    // Set volume
+                    currentAudioFile.Volume = currentVolume;
+                    
+                    // Set the position (after initialization)
+                    double fileDuration = currentAudioFile.TotalTime.TotalSeconds; // Changed variable name
+                    seconds = Math.Clamp(seconds, 0, fileDuration - 0.5); // Stay a bit before the end
+                    currentAudioFile.CurrentTime = TimeSpan.FromSeconds(seconds);
+                    
+                    // Resume playback if it was playing before
+                    if (wasPlaying)
+                    {
+                        outputDevice.Play();
+                    }
+                    else
+                    {
+                        isPaused = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error setting playback position: {ex.Message}");
+                }
+            }
+        }
+
+        public double GetCurrentSongDuration()
+        {
+            if (currentAudioFile != null)
+            {
+                return currentAudioFile.TotalTime.TotalSeconds;
+            }
+            return 0;
+        }
+
+        public bool IsPlaying()
+        {
+            return outputDevice != null && 
+                   outputDevice.PlaybackState == PlaybackState.Playing;
+        }
+
         #endregion
 
         #region Queue Management

@@ -864,8 +864,39 @@
         </Grid>
 
         <!-- Song Progress -->
-        <Grid Grid.Row="2" Background="#252525" Height="10">
-            <ProgressBar x:Name="SongProgressBar" Value="0" Maximum="100" Background="#3E3E3E" Foreground="#1DB954" BorderThickness="0" />
+        <Grid Grid.Row="2" Background="#252525" Height="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Current Time -->
+            <TextBlock x:Name="CurrentTimeText" Grid.Column="0" Text="0:00" Foreground="#B3B3B3" 
+                       FontSize="10" VerticalAlignment="Center" Margin="10,0,5,0"/>
+            
+            <!-- Interactive Timeline Slider -->
+            <Slider x:Name="SongProgressSlider" Grid.Column="1" Value="0" Maximum="100" 
+                    Background="#3E3E3E" Foreground="#1DB954" BorderThickness="0"
+                    IsMoveToPointEnabled="True" PreviewMouseDown="SongProgressSlider_PreviewMouseDown"
+                    PreviewMouseUp="SongProgressSlider_PreviewMouseUp" 
+                    ValueChanged="SongProgressSlider_ValueChanged">
+                <Slider.Resources>
+                    <Style TargetType="Thumb">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <Ellipse Height="12" Width="12" Fill="#1DB954"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Slider.Resources>
+            </Slider>
+            
+            <!-- Total Time -->
+            <TextBlock x:Name="TotalTimeText" Grid.Column="2" Text="0:00" Foreground="#B3B3B3" 
+                       FontSize="10" VerticalAlignment="Center" Margin="5,0,10,0"/>
         </Grid>
 
         <!-- Player Controls -->
