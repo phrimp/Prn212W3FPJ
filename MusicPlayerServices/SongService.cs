@@ -9,7 +9,7 @@ using NAudio.Wave;
 
 namespace MusicPlayerServices
 {
-    public class SongService : ISongService
+    public class SongService
     {
         private SongRepository _songRepository;
 

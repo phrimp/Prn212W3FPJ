@@ -46,5 +46,19 @@ namespace MusicPlayerRepositories
                 throw new Exception(ex.Message);
             }
         }
+
+        public List<Album> GetByArtistId(int artistId)
+        {
+            try
+            {
+                return _dbContext.Albums
+                    .Where(album => album.ArtistId == artistId)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving albums for artist: {ex.Message}");
+            }
+        }
     }
 }

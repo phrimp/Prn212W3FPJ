@@ -28,28 +28,91 @@ namespace MusicPlayerUI
         private readonly ArtistService _artistService;
         private readonly AlbumService _albumService;
         private readonly GenreService _genreService;
+        private readonly UserService _userService; // Add reference to UserService
         private string _selectedFilePath;
         private int _fileDuration;
         private readonly string _targetDirectory;
+        private readonly int _currentUserRole;
+        private readonly string _currentUsername;
+        private Artist _currentArtist; // To store the artist for role 2 users
 
-        public AddSongWindow(SongService songService, ArtistService artistService, AlbumService albumService, GenreService genreService)
+        public AddSongWindow(SongService songService, ArtistService artistService, 
+            AlbumService albumService, GenreService genreService, 
+            int userRole, string username, UserService userService)
         {
             InitializeComponent();
             _songService = songService;
             _artistService = artistService;
             _albumService = albumService;
             _genreService = genreService;
+            _userService = userService;
+            _currentUserRole = userRole;
+            _currentUsername = username;
 
             //Songs Directory
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             _targetDirectory = Path.Combine(baseDirectory, "..", "..", "..", "Assets", "Songs");
             Directory.CreateDirectory(_targetDirectory);
 
-            LoadArtists();
+            ConfigureArtistField();
             LoadAlbums();
             LoadGenres();
 
             ReleaseDatePicker.SelectedDate = DateTime.Today;
+        }
+
+        private void ConfigureArtistField()
+        {
+            try 
+            {
+                if (_currentUserRole == 2) // Artist role
+                {
+                    // Find or create artist associated with this username
+                    _currentArtist = _artistService.GetArtistByUsername(_currentUsername);
+                    if (_currentArtist == null)
+                    {
+                        // Create new artist based on username
+                        _currentArtist = new Artist
+                        {
+                            Name = _currentUsername,
+                            Bio = string.Empty
+                        };
+                        _artistService.AddNewArtist(_currentArtist);
+                    }
+
+                    // Disable artist selection and set to current artist
+                    ArtistComboBox.IsEnabled = false;
+                    ArtistComboBox.IsEditable = false;
+                    
+                    // Set up the ComboBox with just this artist
+                    var singleArtistList = new List<Artist> { _currentArtist };
+                    ArtistComboBox.ItemsSource = singleArtistList;
+                    ArtistComboBox.DisplayMemberPath = "Name";
+                    ArtistComboBox.SelectedValuePath = "ArtistId";
+                    ArtistComboBox.SelectedItem = _currentArtist;
+                    
+                    // Hide the "+" button for adding artists
+                    var addArtistButton = this.FindName("NewArtistButton") as Button;
+                    if (addArtistButton != null)
+                    {
+                        addArtistButton.Visibility = Visibility.Collapsed;
+                    }
+                }
+                else if (_currentUserRole == 3) // Admin role
+                {
+                    // Admin can select from all artists or create new ones
+                    LoadArtists();
+                }
+                else
+                {
+                    // Default behavior for other roles
+                    LoadArtists();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error configuring artist field: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void LoadArtists()
@@ -71,8 +134,18 @@ namespace MusicPlayerUI
         {
             try
             {
-                var albums = _albumService.GetAll();
-                AlbumComboBox.ItemsSource = albums;
+                // For artists, only show their albums
+                if (_currentUserRole == 2 && _currentArtist != null)
+                {
+                    var albums = _albumService.GetByArtistId(_currentArtist.ArtistId);
+                    AlbumComboBox.ItemsSource = albums;
+                }
+                else
+                {
+                    var albums = _albumService.GetAll();
+                    AlbumComboBox.ItemsSource = albums;
+                }
+                
                 AlbumComboBox.DisplayMemberPath = "Title";
                 AlbumComboBox.SelectedValuePath = "AlbumId";
             }
@@ -130,6 +203,7 @@ namespace MusicPlayerUI
 
         private void NewArtistButton_Click(object sender, RoutedEventArgs e)
         {
+            // This button should be hidden for role 2 users
             var newArtistWindow = new AddArtistWindow(_artistService);
             if (newArtistWindow.ShowDialog() == true)
             {
@@ -146,6 +220,7 @@ namespace MusicPlayerUI
                 }
             }
         }
+
         private void NewAlbumButton_Click(object sender, RoutedEventArgs e)
         {
             var newAlbumWindow = new AddAlbumWindow(_albumService, _artistService);

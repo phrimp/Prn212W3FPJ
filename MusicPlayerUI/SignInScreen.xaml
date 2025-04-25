@@ -50,7 +50,7 @@
                         <TextBlock Text="Welcome Back" Foreground="White" FontSize="32" FontWeight="Bold" 
                                   HorizontalAlignment="Left" Margin="0,0,0,40"/>
 
-                        <TextBlock Text="USERNAME" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <TextBlock Text="USERNAME OR EMAIL" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
                         <Border Background="#252525" CornerRadius="6" Height="50" Margin="0,0,0,20">
                             <TextBox x:Name="LoginUsername" Background="Transparent" BorderThickness="0" Foreground="White" 
                                      VerticalContentAlignment="Center" Padding="15,0" FontSize="14"/>
@@ -96,6 +96,20 @@
                         <TextBlock Text="USERNAME" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
                         <Border Background="#252525" CornerRadius="6" Height="50" Margin="0,0,0,20">
                             <TextBox x:Name="RegisterUsername" Background="Transparent" BorderThickness="0" Foreground="White" 
+                                     VerticalContentAlignment="Center" Padding="15,0" FontSize="14"/>
+                        </Border>
+
+                        <!-- New Full Name Field -->
+                        <TextBlock Text="FULL NAME" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <Border Background="#252525" CornerRadius="6" Height="50" Margin="0,0,0,20">
+                            <TextBox x:Name="RegisterFullName" Background="Transparent" BorderThickness="0" Foreground="White" 
+                                     VerticalContentAlignment="Center" Padding="15,0" FontSize="14"/>
+                        </Border>
+
+                        <!-- New Profile Picture URL Field -->
+                        <TextBlock Text="PROFILE PICTURE URL" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <Border Background="#252525" CornerRadius="6" Height="50" Margin="0,0,0,20">
+                            <TextBox x:Name="RegisterProfilePicture" Background="Transparent" BorderThickness="0" Foreground="White" 
                                      VerticalContentAlignment="Center" Padding="15,0" FontSize="14"/>
                         </Border>
 
