@@ -246,19 +246,19 @@ namespace MusicPlayerUI
         {
             progressTimer = new DispatcherTimer();
             progressTimer.Interval = TimeSpan.FromMilliseconds(100); // Update 10 times per second
-            progressTimer.Tick += (s, e) => 
+            progressTimer.Tick += (s, e) =>
             {
                 if (!_userIsDraggingSlider && _songService.IsPlaying())
                 {
                     double currentPosition = _songService.GetPlaybackPosition();
                     double totalDuration = _songService.GetCurrentSongDuration();
-                    
+
                     if (totalDuration > 0)
                     {
                         // Update slider
                         double progressPercentage = (currentPosition / totalDuration) * 100;
                         SongProgressSlider.Value = progressPercentage;
-                        
+
                         // Update time display
                         CurrentTimeText.Text = FormatTimeSpan(TimeSpan.FromSeconds(currentPosition));
                         TotalTimeText.Text = FormatTimeSpan(TimeSpan.FromSeconds(totalDuration));
@@ -739,15 +739,15 @@ namespace MusicPlayerUI
         {
             // Pass all the required parameters including user role, username and userService
             var addSongWindow = new AddSongWindow(
-                _songService, 
-                _artistService, 
-                _albumService, 
+                _songService,
+                _artistService,
+                _albumService,
                 _genreService,
                 _currentUser.RoleId,       // User role
                 _currentUser.Username,     // Username
                 _userService               // UserService
             );
-            
+
             if (addSongWindow.ShowDialog() == true)
             {
                 // Refresh the current view
@@ -1251,20 +1251,20 @@ namespace MusicPlayerUI
         private void SongProgressSlider_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             _userIsDraggingSlider = true;
-            
+
             // Check if music was playing and store that state
             _wasPlayingBeforeDrag = _songService.IsPlaying();
-            
+
             // Pause playback while dragging
             if (_wasPlayingBeforeDrag)
             {
                 _songService.PausePlayback();
             }
-            
+
             // Update the position immediately for single-click seeking
             Point clickPoint = e.GetPosition(SongProgressSlider);
             double sliderWidth = SongProgressSlider.ActualWidth;
-            
+
             if (sliderWidth > 0)
             {
                 double ratio = Math.Clamp(clickPoint.X / sliderWidth, 0, 1);
@@ -1275,22 +1275,22 @@ namespace MusicPlayerUI
         private void SongProgressSlider_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             if (!_userIsDraggingSlider) return;
-            
+
             // Get the new position as a percentage of the song duration
             double newPositionPercent = SongProgressSlider.Value;
-            
+
             // Convert to seconds
             double newPositionSeconds = (_songService.GetCurrentSongDuration() * newPositionPercent) / 100;
-            
+
             // Set the position in the audio player
             _songService.SetPlaybackPosition(newPositionSeconds);
-            
+
             // Resume playback if it was playing before
             if (_wasPlayingBeforeDrag)
             {
                 _songService.ResumePlayback();
             }
-            
+
             _userIsDraggingSlider = false;
         }
 
@@ -1303,6 +1303,183 @@ namespace MusicPlayerUI
                 UpdateTimeDisplay(SongProgressSlider.Value);
             }
         }
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Lưu tên của view hiện tại để khôi phục sau này
+            if (HomeView.Visibility == Visibility.Visible)
+                App.Current.Properties["PreviousViewName"] = "HomeView";
+            else if (MyMusicView.Visibility == Visibility.Visible)
+                App.Current.Properties["PreviousViewName"] = "MyMusicView";
+            else if (FavoritesView.Visibility == Visibility.Visible)
+                App.Current.Properties["PreviousViewName"] = "FavoritesView";
+            else if (PlaylistView.Visibility == Visibility.Visible)
+                App.Current.Properties["PreviousViewName"] = "PlaylistView";
+            else if (ArtistDetailView.Visibility == Visibility.Visible)
+                App.Current.Properties["PreviousViewName"] = "ArtistDetailView";
+
+            // Ẩn header (Grid.Row=0)
+            foreach (UIElement element in ((Grid)this.Content).Children)
+            {
+                if (Grid.GetRow(element) == 0)
+                    element.Visibility = Visibility.Collapsed;
+            }
+
+            // Lấy grid chính chứa nội dung (Grid.Row=1)
+            var mainContentGrid = ((Grid)this.Content).Children.Cast<UIElement>()
+                .FirstOrDefault(e => Grid.GetRow(e) == 1) as Grid;
+
+            if (mainContentGrid != null)
+            {
+                // Ẩn thanh navigation bên trái (Grid.Column=0 trong mainContentGrid)
+                foreach (UIElement element in mainContentGrid.Children)
+                {
+                    if (Grid.GetColumn(element) == 0)
+                        element.Visibility = Visibility.Collapsed;
+                }
+            }
+
+            // Ẩn thanh progress (Grid.Row=2) và controls phát nhạc (Grid.Row=3)
+            foreach (UIElement element in ((Grid)this.Content).Children)
+            {
+                if (Grid.GetRow(element) == 2 || Grid.GetRow(element) == 3)
+                    element.Visibility = Visibility.Collapsed;
+            }
+
+            // Ẩn tất cả các view
+            HomeView.Visibility = Visibility.Collapsed;
+            MyMusicView.Visibility = Visibility.Collapsed;
+            FavoritesView.Visibility = Visibility.Collapsed;
+            PlaylistView.Visibility = Visibility.Collapsed;
+            ArtistDetailView.Visibility = Visibility.Collapsed;
+
+            // Hiển thị form cập nhật hồ sơ
+            UpdateProfilePanel.Visibility = Visibility.Visible;
+
+            // Điền thông tin người dùng vào form
+            if (_currentUser != null)
+            {
+                UpdateEmail.Text = _currentUser.Email ?? string.Empty;
+                UpdateUsername.Text = _currentUser.Username ?? string.Empty;
+                UpdateFullName.Text = _currentUser.FullName ?? string.Empty;
+                UpdateProfilePicture.Text = _currentUser.ProfilePicture ?? string.Empty;
+            }
+            else
+            {
+                MessageBox.Show("Không có thông tin người dùng để cập nhật.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void UpdateProfileSubmit_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_currentUser == null)
+                {
+                    MessageBox.Show("Không có thông tin người dùng để cập nhật.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                // Kiểm tra thông tin đầu vào
+                string newEmail = UpdateEmail.Text.Trim();
+                string newUsername = UpdateUsername.Text.Trim();
+                string newFullName = UpdateFullName.Text.Trim();
+                string newProfilePicture = UpdateProfilePicture.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(newEmail) || string.IsNullOrWhiteSpace(newUsername))
+                {
+                    MessageBox.Show("Email và tên người dùng không được để trống.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // Cập nhật thông tin người dùng
+                _currentUser.Email = newEmail;
+                _currentUser.Username = newUsername;
+                _currentUser.FullName = newFullName;
+                _currentUser.ProfilePicture = newProfilePicture;
+
+                // Lưu vào database
+                _userService.Update(_currentUser);
+
+                // Cập nhật hiển thị
+                UserNameText.Text = _currentUser.Username;
+
+                // Thông báo thành công
+                MessageBox.Show("Cập nhật thông tin thành công!", "Thành công", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                // Ẩn form cập nhật
+                UpdateProfilePanel.Visibility = Visibility.Collapsed;
+
+                // Nạp lại toàn bộ UI bằng cách tạo lại layout
+                InvalidateVisual();
+
+                // Hiển thị lại tất cả các thành phần chính
+                foreach (UIElement element in ((Grid)this.Content).Children)
+                {
+                    // Hiển thị lại tất cả trừ UpdateProfilePanel
+                    if (element != UpdateProfilePanel)
+                    {
+                        element.Visibility = Visibility.Visible;
+                    }
+                }
+
+                // Lấy grid chính chứa nội dung (Grid.Row=1)
+                var mainContentGrid = ((Grid)this.Content).Children.Cast<UIElement>()
+                    .FirstOrDefault(e => Grid.GetRow(e) == 1) as Grid;
+
+                if (mainContentGrid != null)
+                {
+                    foreach (UIElement element in mainContentGrid.Children)
+                    {
+                        element.Visibility = Visibility.Visible;
+                    }
+                }
+
+                // Xác định view nào cần hiển thị lại
+                string previousViewName = App.Current.Properties["PreviousViewName"] as string ?? "HomeView";
+
+                switch (previousViewName)
+                {
+                    case "HomeView":
+                        ShowView(HomeView);
+                        HomeButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3E3E3E"));
+                        LoadHomeViewContent(); // Đảm bảo nội dung được nạp lại
+                        break;
+                    case "MyMusicView":
+                        ShowView(MyMusicView);
+                        MyMusicButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3E3E3E"));
+                        if (ArtistsPanel.Children.Count == 0)
+                            LoadArtists(); // Nạp lại nội dung artist nếu cần
+                        break;
+                    case "FavoritesView":
+                        ShowView(FavoritesView);
+                        FavoritesButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3E3E3E"));
+                        LoadFavorites(); // Nạp lại danh sách yêu thích
+                        break;
+                    case "PlaylistView":
+                        ShowView(PlaylistView);
+                        break;
+                    case "ArtistDetailView":
+                        ShowView(ArtistDetailView);
+                        break;
+                    default:
+                        ShowView(HomeView);
+                        HomeButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3E3E3E"));
+                        LoadHomeViewContent(); // Đảm bảo nội dung được nạp lại
+                        break;
+                }
+
+                // Buộc cập nhật layout
+                UpdateLayout();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Đã xảy ra lỗi khi cập nhật thông tin: {ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+
+
+
 
         private void UpdateTimeDisplay(double progressPercentage)
         {

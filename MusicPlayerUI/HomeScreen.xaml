@@ -35,7 +35,7 @@
 
             <!-- Action buttons on the right -->
             <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,20,0">
-                <Button Content="Settings" Width="80" Height="30" Margin="10,0" Background="#3E3E3E" Foreground="#E0E0E0" BorderThickness="0">
+                <Button Content="Settings" Width="80" Height="30" Margin="10,0" Background="#3E3E3E" Foreground="#E0E0E0" BorderThickness="0" Click="SettingsButton_Click">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="4"/>
@@ -940,5 +940,48 @@
                 <Slider x:Name="VolumeSlider" Width="100" Value="70" Maximum="100" Margin="10,0" Background="#3E3E3E" Foreground="#1DB954" ValueChanged="VolumeSlider_ValueChanged"/>
             </StackPanel>
         </Grid>
+        <!-- Update Profile Form -->
+        <Grid x:Name="UpdateProfilePanel" Visibility="Collapsed">
+            <Border Width="400" VerticalAlignment="Center" Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Update Profile" Foreground="White" FontSize="32" FontWeight="Bold" 
+                       HorizontalAlignment="Left" Margin="0,0,0,40"/>
+
+                    <TextBlock Text="EMAIL" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                    <Border Background="#252525" CornerRadius="6" Height="50" Margin="0,0,0,20">
+                        <TextBox x:Name="UpdateEmail" Background="Transparent" BorderThickness="0" Foreground="White"
+                         VerticalContentAlignment="Center" Padding="15,0" FontSize="14"/>
+                    </Border>
+
+                    <TextBlock Text="USERNAME" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                    <Border Background="#252525" CornerRadius="6" Height="50" Margin="0,0,0,20">
+                        <TextBox x:Name="UpdateUsername" Background="Transparent" BorderThickness="0" Foreground="White"
+                         VerticalContentAlignment="Center" Padding="15,0" FontSize="14"/>
+                    </Border>
+
+                    <TextBlock Text="FULL NAME" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                    <Border Background="#252525" CornerRadius="6" Height="50" Margin="0,0,0,20">
+                        <TextBox x:Name="UpdateFullName" Background="Transparent" BorderThickness="0" Foreground="White"
+                         VerticalContentAlignment="Center" Padding="15,0" FontSize="14"/>
+                    </Border>
+
+                    <TextBlock Text="PROFILE PICTURE URL" Foreground="#808080" FontSize="12" FontWeight="Bold" Margin="0,0,0,8"/>
+                    <Border Background="#252525" CornerRadius="6" Height="50" Margin="0,0,0,20">
+                        <TextBox x:Name="UpdateProfilePicture" Background="Transparent" BorderThickness="0" Foreground="White"
+                         VerticalContentAlignment="Center" Padding="15,0" FontSize="14"/>
+                    </Border>
+
+                    <Button Content="SAVE CHANGES" Height="50" Background="#1DB954" Foreground="White" BorderThickness="0" 
+                    FontSize="14" FontWeight="Bold" Margin="0,10,0,0" Click="UpdateProfileSubmit_Click">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
+    
 </Window>
