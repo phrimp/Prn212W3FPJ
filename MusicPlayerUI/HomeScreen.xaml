@@ -583,7 +583,7 @@
                             <TextBlock x:Name="PlaylistInfoText" Text="125 songs • 8 hours 42 minutes" Foreground="#808080" FontSize="14"/>
                         </StackPanel>
 
-                        <Button x:Name="FavoriteButton" Grid.Column="2" Content="♥" FontSize="18" Foreground="#1DB954" Background="Transparent" BorderThickness="0" Margin="0,0,0,0" Padding="10,0" Click="Favorite_Click"/>
+                        <!--Button x:Name="FavoriteButton" Grid.Column="2" Content="♥" FontSize="18" Foreground="#1DB954" Background="Transparent" BorderThickness="0" Margin="0,0,0,0" Padding="10,0" Click="Favorite_Click"/-->
                     </Grid>
 
                     <!-- Song List -->
@@ -916,7 +916,16 @@
                     <TextBlock x:Name="song_name" Text="Select a song" Foreground="White" FontSize="14" FontWeight="SemiBold"/>
                     <TextBlock x:Name="song_artist" Text="No artist" Foreground="#B3B3B3" FontSize="12" Margin="0,4,0,0"/>
                 </StackPanel>
-                <Button Content="♥" FontSize="18" Foreground="#1DB954" Background="Transparent" BorderThickness="0" Margin="15,0,0,0" Padding="10,0"/>
+                <Button x:Name="NowPlayingFavoriteButton"
+        Content="♥"
+        FontSize="18"
+        Foreground="#1DB954"
+        Background="Transparent"
+        BorderThickness="0"
+        Margin="15,0,0,0"
+        Padding="10,0"
+        Click="NowPlayingFavoriteButton_Click"/>
+
             </StackPanel>
 
             <!-- Controls -->

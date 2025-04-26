@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using MusicPlayerEntities;
 using MusicPlayerRepositories;
 using NAudio.Wave;
@@ -171,5 +172,66 @@ namespace MusicPlayerServices
         {
             return _songRepository.IsPlaying();
         }
+        public List<Song> GetFavoriteSongsByUserId(int userId)
+        {
+            using (var context = new MusicPlayerAppContext())
+            {
+                var favoriteSongs = (from uf in context.UserFavorites
+                                     join song in context.Songs on uf.SongId equals song.SongId
+                                     where uf.UserId == userId
+                                     select song)
+                                    .Include(s => s.Artist)
+                                    .Include(s => s.Album)
+                                    .ToList();
+                return favoriteSongs;
+            }
+        }
+        public void AddFavorite(int userId, int songId)
+        {
+            using (var context = new MusicPlayerAppContext())
+            {
+                var existingFavorite = context.UserFavorites
+                    .FirstOrDefault(f => f.UserId == userId && f.SongId == songId);
+
+                if (existingFavorite == null)
+                {
+                    context.UserFavorites.Add(new UserFavorite
+                    {
+                        UserId = userId,
+                        SongId = songId,
+                        AddedDate = DateTime.Now
+                    });
+                    context.SaveChanges();
+                }
+                else
+                {
+                    throw new Exception("This song is already in your favorites!");
+                }
+            }
+        }
+        public bool IsFavorite(int userId, int songId)
+        {
+            using (var context = new MusicPlayerAppContext())
+            {
+                return context.UserFavorites.Any(f => f.UserId == userId && f.SongId == songId);
+            }
+        }
+
+        public void RemoveFavorite(int userId, int songId)
+        {
+            using (var context = new MusicPlayerAppContext())
+            {
+                var favorite = context.UserFavorites
+                    .FirstOrDefault(f => f.UserId == userId && f.SongId == songId);
+
+                if (favorite != null)
+                {
+                    context.UserFavorites.Remove(favorite);
+                    context.SaveChanges();
+                }
+            }
+        }
+
+
     }
 }

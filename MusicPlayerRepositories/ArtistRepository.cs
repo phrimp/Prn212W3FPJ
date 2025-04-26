@@ -38,7 +38,7 @@ namespace MusicPlayerRepositories
             try
             {
                 return _dbContext.Artists
-            .AsNoTracking()  // Add this line
+            .AsNoTracking()
             .OrderBy(a => a.Name)
             .ToList();
             }

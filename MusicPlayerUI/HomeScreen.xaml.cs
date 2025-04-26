@@ -137,7 +137,7 @@ namespace MusicPlayerUI
             ManageUsersButton.IsEnabled = false;
 
             CreatePlaylistButton.IsEnabled = false;
-            FavoriteButton.IsEnabled = false;
+            //FavoriteButton.IsEnabled = false;
         }
 
         private void LoadArtistSpecificContent()
@@ -290,13 +290,15 @@ namespace MusicPlayerUI
             {
                 Favorite_List.Items.Clear();
 
-                List<Song> favorites = _songService.GetAll();
-                if (favorites == null) { return; }
+                List<Song> favorites = _songService.GetFavoriteSongsByUserId(_currentUserId);
+                if (favorites == null || favorites.Count == 0)
+                {
+                    return;
+                }
 
                 int index = 1;
                 foreach (Song song in favorites)
                 {
-                    // Create a song view model for binding
                     var songVM = new SongViewModel
                     {
                         Index = index.ToString(),
@@ -708,6 +710,34 @@ namespace MusicPlayerUI
 
                 // Reset progress slider when song changes
                 SongProgressSlider.Value = 0;  // Changed from SongProgressBar to SongProgressSlider
+                UpdateNowPlayingFavoriteButton();
+            }
+        }
+        private void UpdateNowPlayingFavoriteButton()
+        {
+            if (_currentUser == null)
+            {
+                NowPlayingFavoriteButton.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            Song currentSong = _songService.GetCurrentSong();
+            if (currentSong != null)
+            {
+                bool isFavorite = _songService.IsFavorite(_currentUser.UserId, currentSong.SongId);
+
+                if (isFavorite)
+                {
+                    NowPlayingFavoriteButton.Foreground = new SolidColorBrush(Color.FromRgb(29, 185, 84)); // Green
+                }
+                else
+                {
+                    NowPlayingFavoriteButton.Foreground = new SolidColorBrush(Colors.Gray); // Gray if not favorite
+                }
+            }
+            else
+            {
+                NowPlayingFavoriteButton.Foreground = new SolidColorBrush(Colors.Gray);
             }
         }
 
@@ -871,9 +901,18 @@ namespace MusicPlayerUI
             Song currentSong = _songService.GetCurrentSong();
             if (currentSong != null)
             {
-                // TODO: Add song to favorites
-                MessageBox.Show($"'{currentSong.Title}' has been added to your favorites.",
-                    "Added to Favorites", MessageBoxButton.OK, MessageBoxImage.Information);
+                try
+                {
+                    _songService.AddFavorite(_currentUser.UserId, currentSong.SongId);
+
+                    MessageBox.Show($"'{currentSong.Title}' has been added to your favorites.",
+                        "Added to Favorites", MessageBoxButton.OK, MessageBoxImage.Information);
+                    LoadFavorites();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error Adding to Favorites", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
             else
             {
@@ -881,6 +920,7 @@ namespace MusicPlayerUI
                     "No Song Selected", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
+
 
         private void LoadHomeViewContent()
         {
@@ -1319,5 +1359,48 @@ namespace MusicPlayerUI
                 ? $"{time.Hours}:{time.Minutes:D2}:{time.Seconds:D2}" 
                 : $"{time.Minutes}:{time.Seconds:D2}";
         }
+        private void NowPlayingFavoriteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser == null)
+            {
+                MessageBox.Show("You need to sign in to manage favorites.",
+                    "Sign In Required", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Song currentSong = _songService.GetCurrentSong();
+            if (currentSong == null)
+            {
+                MessageBox.Show("No song is currently playing.",
+                    "No Song Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            try
+            {
+                bool isFavorite = _songService.IsFavorite(_currentUser.UserId, currentSong.SongId);
+                if (isFavorite)
+                {
+                    _songService.RemoveFavorite(_currentUser.UserId, currentSong.SongId);
+                    MessageBox.Show($"'{currentSong.Title}' has been removed from your favorites.",
+                        "Removed from Favorites", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    _songService.AddFavorite(_currentUser.UserId, currentSong.SongId);
+                    MessageBox.Show($"'{currentSong.Title}' has been added to your favorites.",
+                        "Added to Favorites", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+                UpdateNowPlayingFavoriteButton();
+                LoadFavorites(); 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error managing favorites: {ex.Message}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
     }
 }

@@ -16,32 +16,40 @@ namespace MusicPlayerUI
         {
             InitializeComponent();
             _albumService = albumService;
+            _artistService = artistService;
             LoadArtists();
             ReleaseYearTextBox.Text = DateTime.Now.Year.ToString();
-            _artistService = artistService;
+            
         }
 
         private void LoadArtists()
         {
             try
             {
-                
-                    var artists = _artistService.GetArtistsOrderByName();
-                    ArtistComboBox.ItemsSource = artists;
-                    ArtistComboBox.DisplayMemberPath = "Name";
-                    ArtistComboBox.SelectedValuePath = "ArtistId";
+                var artists = _artistService.GetAllArtists();
 
-                    if (artists.Count > 0)
-                    {
-                        ArtistComboBox.SelectedIndex = 0;
-                    }
-                
+                // Debug output to verify
+                System.Diagnostics.Debug.WriteLine($"Fetched {artists.Count} artists");
+                foreach (var artist in artists)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ID: {artist.ArtistId}, Name: {artist.Name}");
+                }
+
+                ArtistComboBox.ItemsSource = artists;
+                ArtistComboBox.DisplayMemberPath = "Name";
+                ArtistComboBox.SelectedValuePath = "ArtistId";
+
+                if (artists.Count > 0)
+                {
+                    ArtistComboBox.SelectedIndex = 0;
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error loading artists: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
