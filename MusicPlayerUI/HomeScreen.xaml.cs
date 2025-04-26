@@ -950,15 +950,9 @@ namespace MusicPlayerUI
             SelectedPlaylistInfoText.Text =
                 $"{_currentPlaylistSongs.Count} songs • {FormatTotalDuration(TimeSpan.FromSeconds(totalSec))}";
 
-            // 4) Reset trạng thái đang phát
-            _currentPlayingIndex = -1;
-            song_name.Text = "";
-            song_artist.Text = "";
-            PlayBtn.Content = "▶";
+            // 4) Tự động phát bài đầu tiên sau khi trộn
+            PlaySongAtIndex(0);
         }
-
-
-
 
 
         // Sign out functionality
