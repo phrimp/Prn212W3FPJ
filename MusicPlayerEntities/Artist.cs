@@ -7,11 +7,11 @@ public partial class Artist
 {
     public int ArtistId { get; set; }
 
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
-    public string Bio { get; set; }
+    public string? Bio { get; set; }
 
-    public string ImageUrl { get; set; }
+    public string? ImageUrl { get; set; }
 
     public virtual ICollection<Album> Albums { get; set; } = new List<Album>();
 

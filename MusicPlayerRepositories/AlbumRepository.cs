@@ -1,4 +1,5 @@
-﻿using MusicPlayerEntities;
+﻿using Microsoft.EntityFrameworkCore;
+using MusicPlayerEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,7 @@ namespace MusicPlayerRepositories
         }
 
         public List<Album> GetAll() {
-            return _dbContext.Albums.ToList();
+            return _dbContext.Albums.Include(a => a.Artist).ToList();
         }
 
         public void Add(Album album) {
