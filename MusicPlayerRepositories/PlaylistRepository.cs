@@ -1,4 +1,5 @@
-﻿using MusicPlayerEntities;
+﻿using Microsoft.EntityFrameworkCore;
+using MusicPlayerEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,16 +42,29 @@ namespace MusicPlayerRepositories
             return user_playlist;
         }
 
-        public List<Song> GetSongsFromPlaylist(int playlistid)
+        public List<Song> GetSongsFromPlaylist(int playlistId)
         {
-            var current_playlist = _dbContext.Playlists.Where(p => p.PlaylistId == playlistid).FirstOrDefault();
-            if (current_playlist == null)
+            var currentPlaylist = _dbContext.Playlists
+                .FirstOrDefault(p => p.PlaylistId == playlistId);
+
+            if (currentPlaylist == null)
             {
                 throw new Exception("Playlist not found");
             }
-            var songs = _dbContext.PlaylistSongs.Where(p => p.PlaylistId == playlistid).Select(p => p.Song).ToList();
+
+            var songs = _dbContext.PlaylistSongs
+                .Where(ps => ps.PlaylistId == playlistId)
+                .OrderBy(ps => ps.SortOrder)
+                .Include(ps => ps.Song)
+                    .ThenInclude(s => s.Artist)
+                .Include(ps => ps.Song)
+                    .ThenInclude(s => s.Album)
+                .Select(ps => ps.Song)
+                .ToList();
+
             return songs;
         }
+
 
         public void AddSongToPlaylist(int song_id, int playlist_id)
         {
@@ -201,6 +215,28 @@ namespace MusicPlayerRepositories
         public int GetPlaylistSongCount(int playlistId)
         {
             return _dbContext.PlaylistSongs.Count(ps => ps.PlaylistId == playlistId);
+        }
+
+        public void ShufflePlaylist(int playlistId)
+        {
+            var playlistSongs = _dbContext.PlaylistSongs
+                                           .Where(ps => ps.PlaylistId == playlistId)
+                                           .ToList();
+
+            if (!playlistSongs.Any())
+                throw new Exception("No songs found in the playlist");
+
+            // Shuffle danh sách (sử dụng Random)
+            Random rng = new Random();
+            playlistSongs = playlistSongs.OrderBy(x => rng.Next()).ToList();
+
+            // Update lại SortOrder theo thứ tự mới
+            for (int i = 0; i < playlistSongs.Count; i++)
+            {
+                playlistSongs[i].SortOrder = i;
+            }
+
+            _dbContext.SaveChanges();
         }
 
     }

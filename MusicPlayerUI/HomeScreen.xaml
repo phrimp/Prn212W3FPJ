@@ -147,12 +147,11 @@
                         </StackPanel>
                     </Button>
 
-                    <ListBox x:Name="PlaylistsListBox" Background="Transparent" BorderThickness="0" SelectionChanged="PlaylistsListBox_SelectionChanged">
-                        <ListBoxItem Foreground="#E0E0E0" Content="Pop Hits" Padding="30,8,0,8" Tag="1"/>
-                        <ListBoxItem Foreground="#E0E0E0" Content="Rock Classics" Padding="30,8,0,8" Tag="2"/>
-                        <ListBoxItem Foreground="#E0E0E0" Content="Chill Vibes" Padding="30,8,0,8" Tag="3"/>
-                        <ListBoxItem Foreground="#E0E0E0" Content="Workout Mix" Padding="30,8,0,8" Tag="4"/>
-                    </ListBox>
+                    <ListBox x:Name="PlaylistsListBox"
+         Background="Transparent"
+         BorderThickness="0"
+         SelectionChanged="PlaylistsListBox_SelectionChanged"/>
+
                 </StackPanel>
             </Grid>
 
@@ -671,7 +670,47 @@
                             <TextBlock x:Name="SelectedPlaylistNameText" Foreground="White" FontSize="32" FontWeight="Bold" Margin="0,5,0,10" Text="Selected Playlist"/>
                             <TextBlock x:Name="SelectedPlaylistInfoText" Text="0 songs • 0 minutes" Foreground="#808080" FontSize="14"/>
                         </StackPanel>
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button x:Name="BtnAddSongToPlaylist"
+            Content="Add Song"
+            Height="30"
+            Padding="10,0"
+            Margin="0,0,10,0"
+            Background="#1DB954"
+            Foreground="White"
+            Click="BtnAddSongToPlaylist_Click"/>
+
+                            <Button x:Name="BtnShufflePlaylist"
+            Content="Shuffle Playlist"
+            Height="30"
+            Padding="10,0"
+            Margin="0,0,10,0"
+            Background="#1DB954"
+            Foreground="White"
+            Click="BtnShufflePlaylist_Click"/>
+
+                            <Button x:Name="BtnBackSong"
+            Content="Back"
+            Height="30"
+            Padding="10,0"
+            Margin="0,0,10,0"
+            Background="#1DB954"
+            Foreground="White"
+            Click="PreviousSong_Click"/>
+
+                            <Button x:Name="BtnNextSong"
+            Content="Next"
+            Height="30"
+            Padding="10,0"
+            Background="#1DB954"
+            Foreground="White"
+            Click="NextSong_Click"/>
+                        </StackPanel>
+
+
                     </Grid>
+
 
                     <!-- Song List -->
                     <ListView x:Name="Playlist_Songs_List" Grid.Row="1" Margin="20,20,20,10" Background="Transparent" BorderThickness="0" Foreground="White"

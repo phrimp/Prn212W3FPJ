@@ -25,6 +25,11 @@ namespace MusicPlayerUI
         private User _currentUser;
         private bool _userIsDraggingSlider = false;
         private bool _wasPlayingBeforeDrag = false;
+        private List<Song> _currentPlaylistSongs = new List<Song>();
+        private int _currentPlayingIndex = -1;
+
+
+
 
         public HomeScreen(User currentUser = null)
         {
@@ -50,6 +55,7 @@ namespace MusicPlayerUI
             InitializeHomeView();
 
             LoadFavorites();
+            LoadUserPlaylists();
             SetupProgressTimer();
 
             this.Closing += HomeScreen_Closing;
@@ -425,6 +431,8 @@ namespace MusicPlayerUI
             return card;
         }
 
+
+
         private void LoadArtistSongs(int artistId)
         {
             try
@@ -565,6 +573,8 @@ namespace MusicPlayerUI
                 // Load songs
                 Playlist_Songs_List.Items.Clear();
                 List<Song> songs = playlistRepository.GetSongsFromPlaylist(playlistId);
+                _currentPlaylistSongs = songs;
+
 
                 // Update playlist info text
                 int totalSeconds = 0;
@@ -606,6 +616,38 @@ namespace MusicPlayerUI
             {
                 song_name.Text = selectedItem.Title;
                 song_artist.Text = selectedItem.Artist;
+
+                _currentPlayingIndex = Playlist_Songs_List.Items.IndexOf(selectedItem);
+            }
+        }
+
+        private void LoadUserPlaylists()
+        {
+            // Clear danh sách cũ
+            PlaylistsListBox.Items.Clear();
+
+            try
+            {
+                // Lấy playlist của user hiện tại
+                var playlists = PlaylistRepository.Instance.GetUserPlaylist(_currentUserId);
+
+                foreach (var pl in playlists)
+                {
+                    var item = new ListBoxItem
+                    {
+                        Content = pl.Name,
+                        Tag = pl.PlaylistId,
+                        Padding = new Thickness(30, 8, 0, 8),
+                        Foreground = Brushes.White,
+                        Background = Brushes.Transparent
+                    };
+                    PlaylistsListBox.Items.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi load playlist: {ex.Message}",
+                                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -789,6 +831,81 @@ namespace MusicPlayerUI
             }
         }
 
+        private void BtnAddSongToPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            // 1) Lấy playlist hiện tại
+            if (!(PlaylistsListBox.SelectedItem is ListBoxItem plItem) ||
+                !int.TryParse(plItem.Tag.ToString(), out int playlistId))
+            {
+                MessageBox.Show("Please select a playlist in the left panel first.",
+                                "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // 2) Lấy danh sách tất cả bài (bạn có thể lọc theo user nếu muốn)
+            List<Song> allSongs = _songService.GetAll();
+
+            // 3) Hiện dialog chọn bài
+            var dlg = new SelectSongWindow(allSongs)
+            {
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
+
+            if (dlg.ShowDialog() != true)
+                return;
+
+            int songId = dlg.SelectedSongId;
+
+            try
+            {
+                // 4) Gọi repo thêm bài vào playlist
+                PlaylistRepository.Instance.AddSongToPlaylist(songId, playlistId);
+
+                // 5) Reload lại detail của playlist
+                LoadPlaylist(playlistId);
+
+                MessageBox.Show("Song added to playlist!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Error adding song: {ex.Message}",
+                                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void BtnShufflePlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            // 1) Lấy playlist hiện tại
+            if (!(PlaylistsListBox.SelectedItem is ListBoxItem plItem) ||
+                !int.TryParse(plItem.Tag.ToString(), out int playlistId))
+            {
+                MessageBox.Show("Please select a playlist in the left panel first.",
+                                "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            try
+            {
+                // 2) Gọi hàm trộn playlist
+                PlaylistRepository.Instance.ShufflePlaylist(playlistId);
+
+                // 3) Load lại playlist sau khi trộn
+                LoadPlaylist(playlistId);
+
+                MessageBox.Show("Playlist shuffled!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error shuffling playlist: {ex.Message}",
+                                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+
+
+
+
         // Sign out functionality
         private void SignOut_Click(object sender, RoutedEventArgs e)
         {
@@ -884,10 +1001,23 @@ namespace MusicPlayerUI
                 return;
             }
 
-            // TODO: Open create playlist dialog
-            MessageBox.Show("Playlist creation functionality will be implemented in a future update.",
-                "Coming Soon", MessageBoxButton.OK, MessageBoxImage.Information);
+            var createWindow = new CreatePlayListWindow(_currentUser.UserId)
+            {
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
+
+            bool? dialogResult = createWindow.ShowDialog();
+            if (dialogResult == true)
+            {
+                // Tạo thành công, reload ngay
+                LoadUserPlaylists();
+            }
         }
+
+
+
+
 
         private void Favorite_Click(object sender, RoutedEventArgs e)
         {
