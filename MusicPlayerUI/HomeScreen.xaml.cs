@@ -654,47 +654,71 @@ namespace MusicPlayerUI
         #endregion
 
         #region Playback
+        private void PlaySongAtIndex(int index)
+        {
+            if (_currentPlaylistSongs == null || !_currentPlaylistSongs.Any())
+                return;
+
+            // wrap-around
+            if (index < 0)
+                index = _currentPlaylistSongs.Count - 1;
+            else if (index >= _currentPlaylistSongs.Count)
+                index = 0;
+
+            _currentPlayingIndex = index;
+            var song = _currentPlaylistSongs[_currentPlayingIndex];
+
+            // chọn lại item trong ListBox để đồng bộ UI
+            Playlist_Songs_List.SelectedIndex = _currentPlayingIndex;
+            Playlist_Songs_List.ScrollIntoView(Playlist_Songs_List.SelectedItem);
+
+            // phát bài
+            _songService.PlaySong(song);
+            PlayBtn.Content = "❚❚";
+
+            // cập nhật thông tin now playing
+            song_name.Text = song.Title;
+            song_artist.Text = song.Artist?.Name ?? "Unknown Artist";
+            UpdateNowPlayingInfo();
+        }
 
         private void PlaySong(object sender, RoutedEventArgs e)
         {
             if (_songService.IsPaused())
             {
-                // If paused, resume playback
                 _songService.ResumePlayback();
                 PlayBtn.Content = "❚❚";
+                return;
             }
-            else if (_songService.GetPlaybackState() == NAudio.Wave.PlaybackState.Playing)
+            if (_songService.GetPlaybackState() == NAudio.Wave.PlaybackState.Playing)
             {
-                // If playing, pause playback
                 _songService.PausePlayback();
                 PlayBtn.Content = "▶";
+                return;
+            }
+
+            // Nếu đang ở playlist và có item được chọn
+            if (GetVisibleView() == PlaylistView && Playlist_Songs_List.SelectedItem is SongViewModel vm)
+            {
+                int idx = Playlist_Songs_List.Items.IndexOf(vm);
+                PlaySongAtIndex(idx);
             }
             else
             {
-                // If stopped or no current song, play the selected song or queue
+                // các view khác hoặc queue
                 UIElement currentView = GetVisibleView();
-
-                if (currentView == FavoritesView && Favorite_List.SelectedItem != null)
+                if (currentView == FavoritesView && Favorite_List.SelectedItem is SongViewModel fav)
                 {
-                    var selectedItem = Favorite_List.SelectedItem as SongViewModel;
-                    _songService.PlaySong(selectedItem.SongData);
+                    _songService.PlaySong(fav.SongData);
                 }
-                else if (currentView == PlaylistView && Playlist_Songs_List.SelectedItem != null)
+                else if (currentView == ArtistDetailView && ArtistSongs_List.SelectedItem is SongViewModel art)
                 {
-                    var selectedItem = Playlist_Songs_List.SelectedItem as SongViewModel;
-                    _songService.PlaySong(selectedItem.SongData);
-                }
-                else if (currentView == ArtistDetailView && ArtistSongs_List.SelectedItem != null)
-                {
-                    var selectedItem = ArtistSongs_List.SelectedItem as SongViewModel;
-                    _songService.PlaySong(selectedItem.SongData);
+                    _songService.PlaySong(art.SongData);
                 }
                 else
                 {
-                    // No song is selected, try to play from queue
                     _songService.PlayFromQueue();
                 }
-
                 PlayBtn.Content = "❚❚";
                 UpdateNowPlayingInfo();
             }
@@ -712,16 +736,26 @@ namespace MusicPlayerUI
 
         private void NextSong_Click(object sender, RoutedEventArgs e)
         {
-            _songService.NextSong();
-            UpdateNowPlayingInfo();
-            PlayBtn.Content = "❚❚";
+            //_songService.NextSong();
+            //UpdateNowPlayingInfo();
+            //PlayBtn.Content = "❚❚";
+
+            if (_currentPlaylistSongs == null || !_currentPlaylistSongs.Any())
+                return;
+
+            PlaySongAtIndex(_currentPlayingIndex + 1);
         }
 
         private void PreviousSong_Click(object sender, RoutedEventArgs e)
         {
-            _songService.PreviousSong();
-            UpdateNowPlayingInfo();
-            PlayBtn.Content = "❚❚";
+            //_songService.PreviousSong();
+            //UpdateNowPlayingInfo();
+            //PlayBtn.Content = "❚❚";
+
+            if (_currentPlaylistSongs == null || !_currentPlaylistSongs.Any())
+                return;
+
+            PlaySongAtIndex(_currentPlayingIndex - 1);
         }
 
         private void ToggleLoop_Click(object sender, RoutedEventArgs e)
@@ -874,32 +908,53 @@ namespace MusicPlayerUI
             }
         }
 
-        private void BtnShufflePlaylist_Click(object sender, RoutedEventArgs e)
+        private void ShuffleBtn_Click(object sender, RoutedEventArgs e)
         {
-            // 1) Lấy playlist hiện tại
-            if (!(PlaylistsListBox.SelectedItem is ListBoxItem plItem) ||
-                !int.TryParse(plItem.Tag.ToString(), out int playlistId))
+            if (_currentPlaylistSongs == null || !_currentPlaylistSongs.Any())
             {
-                MessageBox.Show("Please select a playlist in the left panel first.",
-                                "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Chưa có playlist nào để trộn.", "Info",
+                                MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
-            try
+            // 1) Shuffle _currentPlaylistSongs dùng Fisher–Yates
+            var rng = new Random();
+            for (int i = _currentPlaylistSongs.Count - 1; i > 0; i--)
             {
-                // 2) Gọi hàm trộn playlist
-                PlaylistRepository.Instance.ShufflePlaylist(playlistId);
-
-                // 3) Load lại playlist sau khi trộn
-                LoadPlaylist(playlistId);
-
-                MessageBox.Show("Playlist shuffled!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                int j = rng.Next(i + 1);
+                var tmp = _currentPlaylistSongs[i];
+                _currentPlaylistSongs[i] = _currentPlaylistSongs[j];
+                _currentPlaylistSongs[j] = tmp;
             }
-            catch (Exception ex)
+
+            // 2) Clear và rebuild ListBox
+            Playlist_Songs_List.Items.Clear();
+            int idx = 1;
+            foreach (var song in _currentPlaylistSongs)
             {
-                MessageBox.Show($"Error shuffling playlist: {ex.Message}",
-                                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                var vm = new SongViewModel
+                {
+                    Index = idx.ToString(),
+                    Title = song.Title,
+                    Artist = song.Artist?.Name ?? "Unknown Artist",
+                    Album = song.Album?.Title ?? "Unknown Album",
+                    Duration = FormatDuration(song.Duration),
+                    SongData = song
+                };
+                Playlist_Songs_List.Items.Add(vm);
+                idx++;
             }
+
+            // 3) Cập nhật thông tin tổng số và thời lượng
+            var totalSec = _currentPlaylistSongs.Sum(s => s.Duration);
+            SelectedPlaylistInfoText.Text =
+                $"{_currentPlaylistSongs.Count} songs • {FormatTotalDuration(TimeSpan.FromSeconds(totalSec))}";
+
+            // 4) Reset trạng thái đang phát
+            _currentPlayingIndex = -1;
+            song_name.Text = "";
+            song_artist.Text = "";
+            PlayBtn.Content = "▶";
         }
 
 

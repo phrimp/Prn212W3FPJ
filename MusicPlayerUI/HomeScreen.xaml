@@ -564,26 +564,8 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Playlist Header -->
-                    <Grid Grid.Row="0" Margin="20,20,20,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Border Grid.Column="0" Width="150" Height="150" Background="#333333" CornerRadius="4">
-                            <TextBlock Text="♥" FontSize="80" Foreground="#1DB954" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        </Border>
-
-                        <StackPanel Grid.Column="1" Margin="20,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="PLAYLIST" Foreground="#808080" FontSize="12"/>
-                            <TextBlock x:Name="PlaylistNameText" Foreground="White" FontSize="32" FontWeight="Bold" Margin="0,5,0,10" Text="Favorites"/>
-                            <TextBlock x:Name="PlaylistInfoText" Text="125 songs • 8 hours 42 minutes" Foreground="#808080" FontSize="14"/>
-                        </StackPanel>
-
-                        <!--Button x:Name="FavoriteButton" Grid.Column="2" Content="♥" FontSize="18" Foreground="#1DB954" Background="Transparent" BorderThickness="0" Margin="0,0,0,0" Padding="10,0" Click="Favorite_Click"/-->
-                    </Grid>
+                    
+                    
 
                     <!-- Song List -->
                     <ListView x:Name="Favorite_List" Grid.Row="1" Margin="20,20,20,10" Background="Transparent" BorderThickness="0" Foreground="White"
@@ -681,31 +663,8 @@
             Foreground="White"
             Click="BtnAddSongToPlaylist_Click"/>
 
-                            <Button x:Name="BtnShufflePlaylist"
-            Content="Shuffle Playlist"
-            Height="30"
-            Padding="10,0"
-            Margin="0,0,10,0"
-            Background="#1DB954"
-            Foreground="White"
-            Click="BtnShufflePlaylist_Click"/>
 
-                            <Button x:Name="BtnBackSong"
-            Content="Back"
-            Height="30"
-            Padding="10,0"
-            Margin="0,0,10,0"
-            Background="#1DB954"
-            Foreground="White"
-            Click="PreviousSong_Click"/>
-
-                            <Button x:Name="BtnNextSong"
-            Content="Next"
-            Height="30"
-            Padding="10,0"
-            Background="#1DB954"
-            Foreground="White"
-            Click="NextSong_Click"/>
+                            
                         </StackPanel>
 
 
@@ -969,7 +928,7 @@
 
             <!-- Controls -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Button x:Name="ShuffleBtn" Content="🔀" FontSize="14" Foreground="#B3B3B3" Background="Transparent" BorderThickness="0" Padding="15,0"/>
+                <Button x:Name="ShuffleBtn" Content="🔀" FontSize="14" Foreground="#B3B3B3" Background="Transparent" BorderThickness="0" Padding="15,0" Click="ShuffleBtn_Click"/>
                 <Button x:Name="PrevButton" Content="◀◀" FontSize="14" Foreground="#E0E0E0" Background="Transparent" BorderThickness="0" Padding="15,0" Click="PreviousSong_Click"/>
                 <Button x:Name="PlayBtn" Content="▶" FontSize="24" Foreground="White" Background="#1DB954" BorderThickness="0" Width="40" Height="40" Margin="10,0" Click="PlaySong">
                     <Button.Resources>
