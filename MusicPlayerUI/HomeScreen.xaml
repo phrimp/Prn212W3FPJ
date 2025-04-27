@@ -945,7 +945,119 @@
             <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
                 <Button Content="🔊" FontSize="14" Foreground="#E0E0E0" Background="Transparent" BorderThickness="0" Padding="10,0"/>
                 <Slider x:Name="VolumeSlider" Width="100" Value="70" Maximum="100" Margin="10,0" Background="#3E3E3E" Foreground="#1DB954" ValueChanged="VolumeSlider_ValueChanged"/>
+                <!-- Add this to HomeScreen.xaml inside the player controls section, 
+     right after the volume controls in the Grid.Column="2" StackPanel -->
+
+                <Separator Margin="10,0" Width="1" Height="20" Background="#3E3E3E"/>
+                <Button x:Name="GestureControlButton" 
+        Content="👋" 
+        FontSize="18" 
+        ToolTip="Control with hand gestures"
+        Foreground="#E0E0E0" 
+        Background="Transparent" 
+        BorderThickness="0" 
+        Padding="10,0"
+        Click="GestureControlButton_Click"/>
+
+                <!-- Add this popup for the camera feed at the end of your window, just before the closing </Grid> -->
+                <Popup x:Name="CameraPopup" 
+       PlacementTarget="{Binding ElementName=GestureControlButton}" 
+       Placement="Top" 
+       AllowsTransparency="True" 
+       PopupAnimation="Fade" 
+       StaysOpen="False">
+                    <Border Background="#252525" 
+            BorderBrush="#1DB954" 
+            BorderThickness="2" 
+            CornerRadius="8" 
+            Padding="10">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="Hand Gesture Control" 
+                           Foreground="#E0E0E0" 
+                           FontSize="16" 
+                           FontWeight="Bold" 
+                           Margin="0,0,0,10"/>
+
+                                <Image x:Name="CameraPreviewImage" 
+                       Width="640" 
+                       Height="480" 
+                       Stretch="Uniform"/>
+
+                                <TextBlock x:Name="GestureStatusText" 
+                           Text="Waiting for gesture..." 
+                           Foreground="#1DB954" 
+                           FontSize="14" 
+                           Margin="0,10,0,10" 
+                           TextAlignment="Center"/>
+
+                                <TextBlock Text="Gestures:" 
+                           Foreground="#E0E0E0" 
+                           FontSize="14" 
+                           FontWeight="Bold" 
+                           Margin="0,0,0,5"/>
+
+                                <TextBlock Text="• Move hand left/right: Previous/Next song" 
+                           Foreground="#B3B3B3" 
+                           FontSize="12" 
+                           Margin="10,0,0,3"/>
+
+                                <TextBlock Text="• Open/Close hand: Play/Pause" 
+                           Foreground="#B3B3B3" 
+                           FontSize="12" 
+                           Margin="10,0,0,3"/>
+
+                                <TextBlock Text="• Move hand up/down: Volume control" 
+                           Foreground="#B3B3B3" 
+                           FontSize="12" 
+                           Margin="10,0,0,3"/>
+
+                                <TextBlock Text="• Wave hand: Play random song" 
+                           Foreground="#B3B3B3" 
+                           FontSize="12" 
+                           Margin="10,0,0,3"/>
+
+                                <Button Content="Close" 
+                        Background="#3E3E3E" 
+                        Foreground="#E0E0E0" 
+                        BorderThickness="0" 
+                        Margin="0,10,0,0" 
+                        Padding="10,5" 
+                        HorizontalAlignment="Center"
+                        Click="CloseGestureControl_Click">
+                                    <Button.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="4"/>
+                                        </Style>
+                                    </Button.Resources>
+                                </Button>
+                            </StackPanel>
+
+                            <!-- Overlay for no camera access -->
+                            <Border x:Name="NoCameraOverlay" Background="#80000000" Visibility="Collapsed">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="No Camera Access" 
+                           Foreground="White" 
+                           FontSize="24" 
+                           FontWeight="Bold"
+                           TextAlignment="Center"/>
+                                    <TextBlock Text="Running in simulation mode" 
+                           Foreground="#B3B3B3" 
+                           FontSize="16"
+                           TextAlignment="Center"
+                           Margin="0,10,0,20"/>
+                                    <TextBlock Text="Random gestures will be detected&#x0a;to demonstrate functionality" 
+                           Foreground="White" 
+                           FontSize="14"
+                           TextAlignment="Center"
+                           Margin="20"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Popup>
             </StackPanel>
+
         </Grid>
         <!-- Update Profile Form -->
         <Grid x:Name="UpdateProfilePanel" Visibility="Collapsed">

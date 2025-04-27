@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MusicPlayerUI": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

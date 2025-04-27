@@ -841,6 +841,238 @@ namespace MusicPlayerUI
 
         #endregion
 
+        #region Hand Gesture Control
+        private HandGestureDetector _gestureDetector;
+        private bool _gestureControlActive = false;
+
+        /// <summary>
+        /// Initializes the hand gesture detector system
+        /// </summary>
+        private void InitializeGestureControl()
+        {
+            try
+            {
+                _gestureDetector = new HandGestureDetector();
+                _gestureDetector.GestureDetected += OnGestureDetected;
+                _gestureDetector.FrameUpdated += OnFrameUpdated;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error initializing gesture control: {ex.Message}",
+                    "Gesture Control Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Handles the gesture control button click event
+        /// </summary>
+        private void GestureControlButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_gestureDetector == null)
+                {
+                    InitializeGestureControl();
+                }
+
+                if (!_gestureControlActive)
+                {
+                    // Start gesture control
+                    _gestureControlActive = true;
+                    _gestureDetector?.Start();
+                    GestureControlButton.Foreground = new SolidColorBrush(Color.FromRgb(29, 185, 84)); // Green
+                    CameraPopup.IsOpen = true;
+                    GestureStatusText.Text = "Waiting for gesture...";
+
+                    // Update UI based on camera availability
+                    if (_gestureDetector._capture == null || !_gestureDetector._capture.IsOpened())
+                    {
+                        GestureStatusText.Text = "Simulation mode - no camera";
+                        CameraPreviewImage.Opacity = 0.8;
+                    }
+                    else
+                    {
+                        CameraPreviewImage.Opacity = 1.0;
+                    }
+                }
+                else
+                {
+                    // Stop gesture control
+                    StopGestureControl();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error with gesture control: {ex.Message}",
+                    "Gesture Control Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Stops the gesture control system
+        /// </summary>
+        private void StopGestureControl()
+        {
+            _gestureControlActive = false;
+            _gestureDetector?.Stop();
+            GestureControlButton.Foreground = new SolidColorBrush(Colors.Gray);
+            CameraPopup.IsOpen = false;
+        }
+
+        /// <summary>
+        /// Handles the close button click in the camera popup
+        /// </summary>
+        private void CloseGestureControl_Click(object sender, RoutedEventArgs e)
+        {
+            StopGestureControl();
+        }
+
+        /// <summary>
+        /// Updates the camera preview image
+        /// </summary>
+        private void OnFrameUpdated(object sender, System.Windows.Media.Imaging.WriteableBitmap frame)
+        {
+            CameraPreviewImage.Source = frame;
+        }
+
+        /// <summary>
+        /// Handles detected gestures and performs corresponding actions
+        /// </summary>
+        private void OnGestureDetected(object sender, string gesture)
+        {
+            try
+            {
+                // Update status text
+                GestureStatusText.Text = $"Detected: {gesture}";
+
+                // Perform actions based on gesture
+                switch (gesture.ToLower())
+                {
+                    case "next":
+                        // Play next song
+                        NextSong_Click(this, new RoutedEventArgs());
+                        break;
+
+                    case "previous":
+                        // Play previous song
+                        PreviousSong_Click(this, new RoutedEventArgs());
+                        break;
+
+                    case "playpause":
+                        // Toggle play/pause
+                        PlaySong(this, new RoutedEventArgs());
+                        break;
+
+                    case "volumeup":
+                        // Increase volume
+                        VolumeSlider.Value = Math.Min(VolumeSlider.Value + 10, 100);
+                        break;
+
+                    case "volumedown":
+                        // Decrease volume
+                        VolumeSlider.Value = Math.Max(VolumeSlider.Value - 10, 0);
+                        break;
+
+                    case "random":
+                        // Play random song
+                        PlayRandomSong();
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error handling gesture: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Plays a random song from the current playlist or library
+        /// </summary>
+        private void PlayRandomSong()
+        {
+            try
+            {
+                // Get current content
+                List<Song> songsToChooseFrom = new List<Song>();
+
+                // Determine which view is active and get songs accordingly
+                if (PlaylistView.Visibility == Visibility.Visible && _currentPlaylistSongs != null && _currentPlaylistSongs.Any())
+                {
+                    songsToChooseFrom = _currentPlaylistSongs;
+                }
+                else if (FavoritesView.Visibility == Visibility.Visible && Favorite_List.Items.Count > 0)
+                {
+                    // Extract songs from favorites list
+                    foreach (var item in Favorite_List.Items)
+                    {
+                        if (item is SongViewModel vm && vm.SongData != null)
+                        {
+                            songsToChooseFrom.Add(vm.SongData);
+                        }
+                    }
+                }
+                else if (ArtistDetailView.Visibility == Visibility.Visible && ArtistSongs_List.Items.Count > 0)
+                {
+                    // Extract songs from artist view
+                    foreach (var item in ArtistSongs_List.Items)
+                    {
+                        if (item is SongViewModel vm && vm.SongData != null)
+                        {
+                            songsToChooseFrom.Add(vm.SongData);
+                        }
+                    }
+                }
+                else
+                {
+                    // Default: Get all songs from the library
+                    songsToChooseFrom = _songService.GetAll();
+                }
+
+                // Select and play a random song
+                if (songsToChooseFrom.Any())
+                {
+                    Random random = new Random();
+                    int randomIndex = random.Next(songsToChooseFrom.Count);
+                    Song randomSong = songsToChooseFrom[randomIndex];
+
+                    // Play the song
+                    _songService.PlaySong(randomSong);
+                    UpdateNowPlayingInfo();
+                    PlayBtn.Content = "❚❚";
+
+                    // Update status
+                    GestureStatusText.Text = $"Playing random: {randomSong.Title}";
+                }
+                else
+                {
+                    GestureStatusText.Text = "No songs available to play randomly";
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error playing random song: {ex.Message}");
+                GestureStatusText.Text = "Error playing random song";
+            }
+        }
+
+        /// <summary>
+        /// Cleanup resources when window is closing
+        /// </summary>
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+
+            // Dispose gesture detector
+            if (_gestureDetector != null)
+            {
+                _gestureDetector.Stop();
+                _gestureDetector.Dispose();
+                _gestureDetector = null;
+            }
+        }
+
+        #endregion
+
         private void AddSongButton_Click(object sender, RoutedEventArgs e)
         {
             // Pass all the required parameters including user role, username and userService
