@@ -1169,7 +1169,6 @@ namespace MusicPlayerUI
                 _currentPlaylistSongs[j] = tmp;
             }
 
-            // 2) Clear và rebuild ListBox
             Playlist_Songs_List.Items.Clear();
             int idx = 1;
             foreach (var song in _currentPlaylistSongs)
@@ -1187,12 +1186,11 @@ namespace MusicPlayerUI
                 idx++;
             }
 
-            // 3) Cập nhật thông tin tổng số và thời lượng
             var totalSec = _currentPlaylistSongs.Sum(s => s.Duration);
             SelectedPlaylistInfoText.Text =
                 $"{_currentPlaylistSongs.Count} songs • {FormatTotalDuration(TimeSpan.FromSeconds(totalSec))}";
 
-            // 4) Tự động phát bài đầu tiên sau khi trộn
+
             PlaySongAtIndex(0);
         }
 

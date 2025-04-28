@@ -1,7 +1,7 @@
 ﻿<Window x:Class="MusicPlayerUI.CreatePlayListWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Create Playlist" Height="300" Width="400" WindowStartupLocation="CenterOwner">
+        Title="Create Playlist" Height="130" Width="400" WindowStartupLocation="CenterOwner">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -19,16 +19,8 @@
         <Label Grid.Row="0" Grid.Column="0" Content="Name:" VerticalAlignment="Center" Margin="0,0,5,5"/>
         <TextBox Grid.Row="0" Grid.Column="1" Name="txtName" Margin="0,0,0,5"/>
 
-        <!-- Playlist Description -->
-        <Label Grid.Row="1" Grid.Column="0" Content="Description:" VerticalAlignment="Center" Margin="0,0,5,5"/>
-        <TextBox Grid.Row="1" Grid.Column="1" Name="txtDescription" Margin="0,0,0,5"/>
-
-        <!-- Cover Image URL -->
-        <Label Grid.Row="2" Grid.Column="0" Content="Cover Image URL:" VerticalAlignment="Center" Margin="0,0,5,5"/>
-        <TextBox Grid.Row="2" Grid.Column="1" Name="txtCoverImageUrl" Margin="0,0,0,5"/>
-
-        <!-- Public Checkbox -->
-        <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Name="chkIsPublic" Content="Public Playlist" Margin="0,0,0,10"/>
+        <!-- Public Checkbox --><!--
+        <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Name="chkIsPublic" Content="Public Playlist" Margin="0,0,0,10"/>-->
 
         <!-- Buttons -->
         <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">

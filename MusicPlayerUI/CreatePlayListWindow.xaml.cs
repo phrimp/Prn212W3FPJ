@@ -52,9 +52,9 @@ namespace MusicPlayerUI
             var playlist = new Playlist
             {
                 Name = name,
-                Description = txtDescription.Text.Trim(),
-                CoverImageUrl = txtCoverImageUrl.Text.Trim(),
-                IsPublic = chkIsPublic.IsChecked == true,
+                //Description = txtDescription.Text.Trim(),
+                //CoverImageUrl = txtCoverImageUrl.Text.Trim(),
+                //IsPublic = chkIsPublic.IsChecked == true,
                 UserId = _userId,
                 CreatedDate = DateTime.Now,
                 LastUpdatedDate = DateTime.Now
