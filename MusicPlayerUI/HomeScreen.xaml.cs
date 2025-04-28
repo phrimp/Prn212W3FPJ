@@ -27,11 +27,13 @@ namespace MusicPlayerUI
         private bool _wasPlayingBeforeDrag = false;
         private List<Song> _currentPlaylistSongs = new List<Song>();
         private int _currentPlayingIndex = -1;
+        private readonly PlaylistRepository _playlistRepo = PlaylistRepository.Instance;
+        private int _currentPlaylistId;
 
 
 
 
-        public HomeScreen(User currentUser = null)
+        public HomeScreen(User currentUser = null, int playlistId = 0)
         {
             InitializeComponent();
             _userService = new UserService();
@@ -39,6 +41,14 @@ namespace MusicPlayerUI
             _artistService = new ArtistService();
             _albumService = new AlbumService();
             _genreService = new GenreService();
+            _playlistRepo = new PlaylistRepository();
+            _currentPlaylistId = playlistId;
+
+            if (_currentPlaylistId > 0)
+            {
+                PlaylistView.Visibility = Visibility.Visible;
+                LoadPlaylist(_currentPlaylistId);
+            }
 
             if (currentUser != null)
             {
@@ -558,8 +568,10 @@ namespace MusicPlayerUI
             try
             {
                 // Get the repository through dependency injection if possible
-                var playlistRepository = PlaylistRepository.Instance;
-                var playlist = playlistRepository.GetOne(playlistId);
+                //var playlistRepository = PlaylistRepository.Instance;
+                //var playlist = playlistRepository.GetOne(playlistId);
+
+                var playlist = _playlistRepo.GetOne(playlistId);
 
                 if (playlist == null)
                 {
@@ -567,22 +579,18 @@ namespace MusicPlayerUI
                     return;
                 }
 
-                // Set playlist info
+                // Cập nhật lại _currentPlaylistId để chắc chắn
+                _currentPlaylistId = playlist.PlaylistId;
+
                 SelectedPlaylistNameText.Text = playlist.Name;
 
-                // Load songs
                 Playlist_Songs_List.Items.Clear();
-                List<Song> songs = playlistRepository.GetSongsFromPlaylist(playlistId);
+                var songs = _playlistRepo.GetSongsFromPlaylist(_currentPlaylistId);
                 _currentPlaylistSongs = songs;
 
 
-                // Update playlist info text
-                int totalSeconds = 0;
-                foreach (var song in songs)
-                {
-                    totalSeconds += song.Duration;
-                }
-                TimeSpan totalDuration = TimeSpan.FromSeconds(totalSeconds);
+                int totalSeconds = songs.Sum(s => s.Duration);
+                var totalDuration = TimeSpan.FromSeconds(totalSeconds);
                 SelectedPlaylistInfoText.Text = $"{songs.Count} songs • {FormatTotalDuration(totalDuration)}";
 
                 int index = 1;
@@ -650,6 +658,8 @@ namespace MusicPlayerUI
                                 "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+
 
         #endregion
 
@@ -1185,6 +1195,44 @@ namespace MusicPlayerUI
             // 4) Tự động phát bài đầu tiên sau khi trộn
             PlaySongAtIndex(0);
         }
+
+        private void BtnRemoveSongFromPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedVM = Playlist_Songs_List.SelectedItem as SongViewModel;
+            if (selectedVM == null)
+            {
+                MessageBox.Show("Vui lòng chọn một bài hát để xóa.",
+                                "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var result = MessageBox.Show(
+                $"Bạn có chắc muốn xóa \"{selectedVM.Title}\" khỏi playlist?",
+                "Confirm Remove",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                // Dùng đúng playlistId đã load
+                _playlistRepo.RemoveSongFromPlaylist(
+                    songId: selectedVM.SongData.SongId,
+                    playlistId: _currentPlaylistId);
+
+                // Reload lại playlist để cập nhật UI
+                LoadPlaylist(_currentPlaylistId);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Xóa bài hát thất bại: {ex.Message}",
+                                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+
 
 
         // Sign out functionality

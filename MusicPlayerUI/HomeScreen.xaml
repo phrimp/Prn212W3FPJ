@@ -663,8 +663,17 @@
             Foreground="White"
             Click="BtnAddSongToPlaylist_Click"/>
 
+                            <Button x:Name="BtnRemoveSongFromPlaylist"
+                    Content="Remove Song"
+                    Height="30"
+                    Padding="10,0"
+                    Margin="0,0,10,0"
+                    Background="#E02424"
+                    Foreground="White"
+                    Click="BtnRemoveSongFromPlaylist_Click"/>
 
-                            
+
+
                         </StackPanel>
 
 
